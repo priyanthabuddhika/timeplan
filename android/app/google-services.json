@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "499782957924",
+    "firebase_url": "https://timeplan-77051.firebaseio.com",
+    "project_id": "timeplan-77051",
+    "storage_bucket": "timeplan-77051.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499782957924:android:2b6ee38816de83bf3b5871",
+        "android_client_info": {
+          "package_name": "lk.flexbit.timeplan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "499782957924-aer6ub89kiie37tvujke3kl5nj7b5ims.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "lk.flexbit.timeplan",
+            "certificate_hash": "8bfff952a4e2a0895010306d50a7c09a063b564e"
+          }
+        },
+        {
+          "client_id": "499782957924-voc9e8lsd2eu9mak7492n714d5q3ulg8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-Xo_IVkVtmwkhdGRC7kUFNxDT_ZpqnoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "499782957924-voc9e8lsd2eu9mak7492n714d5q3ulg8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
