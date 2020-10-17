@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:timeplan/screens/Login/login_screen.dart';
-import 'package:timeplan/screens/Signup/signup_screen.dart';
+import 'package:timeplan/screens/authenticate/Login/login_screen.dart';
+import 'package:timeplan/screens/authenticate/Signup/signup_screen.dart';
 import 'package:timeplan/screens/Welcome/components/background.dart';
 import 'package:timeplan/components/rounded_button.dart';
 import 'package:timeplan/shared/constants.dart';

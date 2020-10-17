@@ -1,5 +1,4 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:timeplan/models/user.dart';
@@ -31,15 +30,13 @@ class MyApp extends StatelessWidget {
           primaryColor: kPrimaryColor,
           scaffoldBackgroundColor: Colors.white,
         ),
-
         // Named Routes
         // routes: {
-        //   '/': (context) => LoginScreen(),
-        //   '/topics': (context) => TopicsScreen(),
-        //   '/profile': (context) => ProfileScreen(),
-        //   '/about': (context) => AboutScreen(),
+        //   Home.id: (context) => Home(),
+        //   WelcomeScreen.id: (context) => WelcomeScreen(),
+        //   LoginScreen.id: (context) => LoginScreen(),
+        //   SignUpScreen.id: (context) => SignUpScreen(),
         // },
-
         home: Wrapper(),
       ),
     );

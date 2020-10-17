@@ -18,6 +18,7 @@ class AuthService {
   // auth change user stream
   Stream<UserModel> get user {
     return _auth.authStateChanges().map(_userFromFirebaseUser);
+    
   }
 
   // Firebase user one-time fetch

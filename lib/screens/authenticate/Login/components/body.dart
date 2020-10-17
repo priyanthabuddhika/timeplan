@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:timeplan/screens/Login/components/background.dart';
-import 'package:timeplan/screens/Signup/signup_screen.dart';
+import 'package:timeplan/screens/authenticate/Login/components/background.dart';
 import 'package:timeplan/components/already_have_an_account_acheck.dart';
 import 'package:timeplan/components/rounded_button.dart';
 import 'package:timeplan/services/auth.dart';
@@ -8,8 +7,10 @@ import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/shared/loading.dart';
 
 class Body extends StatefulWidget {
+  final Function toggleView;
+
   const Body({
-    Key key,
+    Key key,this.toggleView
   }) : super(key: key);
 
   @override
@@ -27,10 +28,14 @@ class _BodyState extends State<Body> {
   String email = '';
   String password = '';
 
+  bool isObscure = true;
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return loading ? Loading() : Background(
+    return loading
+        ? Loading()
+        : Background(
             child: SingleChildScrollView(
               child: Form(
                 key: _formKey,
@@ -87,7 +92,7 @@ class _BodyState extends State<Body> {
                         borderRadius: BorderRadius.circular(29),
                       ),
                       child: TextFormField(
-                        obscureText: true,
+                        obscureText: isObscure,
                         onChanged: (val) {
                           setState(() => password = val);
                         },
@@ -101,9 +106,16 @@ class _BodyState extends State<Body> {
                             Icons.lock,
                             color: kPrimaryColor,
                           ),
-                          suffixIcon: Icon(
-                            Icons.visibility,
-                            color: kPrimaryColor,
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isObscure = !isObscure;
+                              });
+                            },
+                            child: Icon(
+                              isObscure ? Icons.visibility : Icons.visibility_off,
+                              color: kPrimaryColor,
+                            ),
                           ),
                           border: InputBorder.none,
                         ),
@@ -122,11 +134,7 @@ class _BodyState extends State<Body> {
                               loading = false;
                               error = 'Please supply a valid email';
                             });
-                          }
-                          else {
-                            Navigator.pop(context);
-                          }
-
+                          } 
                         }
                       },
                     ),
@@ -136,16 +144,7 @@ class _BodyState extends State<Body> {
                       style: TextStyle(color: Colors.red, fontSize: 14.0),
                     ),
                     AlreadyHaveAnAccountCheck(
-                      press: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return SignUpScreen();
-                            },
-                          ),
-                        );
-                      },
+                      press: () => widget.toggleView(),
                     ),
                   ],
                 ),
