@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Reminder {
   final String id;
@@ -20,7 +19,7 @@ class Reminder {
       'title': title,
       'description': description,
       'type': type,
-      'date': date,
+      'date': date.toString(),
     };
   }
 
@@ -32,9 +31,7 @@ class Reminder {
     String title = data['title'];
     String description = data['description'];
     String type = data['type'];
-    
-    Timestamp timestamp = data['date'];
-    DateTime date = timestamp.toDate();
+    DateTime date = DateTime.parse(data['date']);
     return Reminder(title: title, description: description, type: type, date: date,id: id);
   }
 }

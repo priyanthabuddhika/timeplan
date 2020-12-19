@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:timeplan/models/remider.dart';
 
 /*
 This class represent all possible CRUD operation for Firestore.
@@ -18,7 +19,7 @@ class FirestoreService {
   }) async {
     final reference = FirebaseFirestore.instance.doc(path);
     print('$path: $data');
-    await reference.set(data,SetOptions(merge: true) );
+    await reference.set(data, SetOptions(merge: true));
   }
 
   Future<void> bulkSet({
@@ -64,13 +65,13 @@ class FirestoreService {
     });
   }
 
+  
   Stream<T> documentStream<T>({
     @required String path,
     @required T builder(Map<String, dynamic> data, String documentID),
   }) {
     final DocumentReference reference = FirebaseFirestore.instance.doc(path);
     final Stream<DocumentSnapshot> snapshots = reference.snapshots();
-    return snapshots
-        .map((snapshot) => builder(snapshot.data(), snapshot.id));
+    return snapshots.map((snapshot) => builder(snapshot.data(), snapshot.id));
   }
 }

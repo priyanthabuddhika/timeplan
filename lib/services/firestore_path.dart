@@ -7,4 +7,6 @@ This class work together with FirestoreService and FirestoreDatabase.
 class FirestorePath {
   static String reminder(String uid, String reminderId) => 'users/$uid/reminders/$reminderId';
   static String reminders(String uid) => 'users/$uid/reminders';
+  static String schedule(String uid, String scheduleId) => 'users/$uid/schedules/$scheduleId';
+  static String schedules(String uid) => 'users/$uid/schedules';
 }

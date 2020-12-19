@@ -1,79 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/remindertype.dart';
-import 'package:timeplan/models/remider.dart';
+import 'package:timeplan/models/schedule.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/services/app_localizations.dart';
+import 'package:weekday_selector/weekday_selector.dart';
 
-class ReminderPage extends StatefulWidget {
-  static const String id = "reminderspage";
+class SchedulePage extends StatefulWidget {
+  static const String id = "schedulespage";
   @override
-  _ReminderPageState createState() => _ReminderPageState();
+  _SchedulePageState createState() => _SchedulePageState();
 }
 
-class _ReminderPageState extends State<ReminderPage> {
+class _SchedulePageState extends State<SchedulePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _formKey = GlobalKey<FormState>();
   // DatabaseHelper _dbHelper = DatabaseHelper();
-  Reminder _reminder;
-  
+  Schedule _schedule;
+
   TextEditingController _titleController;
   TextEditingController _descriptionController;
 
-  String _reminderType;
+  String _scheduleType;
 
   FocusNode _titleFocus;
   FocusNode _descriptionFocus;
-
-  DateTime selectedDate;
+  DateTime startTime;
+  DateTime endTime;
   TimeOfDay selectedTime;
 
   bool _initCompleted;
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        // print(picked.toString());
-        selectedDate = picked;
-      });
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
+  Future<void> _selectStartTime(BuildContext context) async {
     DateTime dateTimeTemp;
     final TimeOfDay picked = await showTimePicker(
       context: context,
-      initialTime: selectedTime,
+      initialTime: TimeOfDay.fromDateTime(startTime),
     );
     if (picked != null && picked != selectedTime) {
-      dateTimeTemp = selectedDate.add(
+      dateTimeTemp = startTime.add(
         Duration(hours: picked.hour, minutes: picked.minute),
       );
 
       setState(() {
-        selectedDate = dateTimeTemp;
-        print(selectedDate.toString());
+        startTime = dateTimeTemp;
+        print(startTime.toString());
+      });
+    }
+  }
+
+  Future<void> _selectEndTime(BuildContext context) async {
+    DateTime dateTimeTemp;
+    final TimeOfDay picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(endTime),
+    );
+    if (picked != null && picked != selectedTime) {
+      dateTimeTemp = startTime.add(
+        Duration(hours: picked.hour, minutes: picked.minute),
+      );
+
+      setState(() {
+        endTime = dateTimeTemp;
+        print(startTime.toString());
       });
     }
   }
 
   @override
   void initState() {
-    // _reminder =  Reminder();
+    // _schedule =  Schedule();
     _titleFocus = FocusNode();
     _descriptionFocus = FocusNode();
 
-    selectedDate = DateTime.now();
-    print(selectedDate.toLocal().toString());
-    selectedTime = TimeOfDay.now();
+    startTime = DateTime.now();
+    endTime = startTime.add(Duration(hours: 1));
 
-    _reminderType = "";
+    _scheduleType = "";
 
     _initCompleted = false;
 
@@ -93,36 +98,38 @@ class _ReminderPageState extends State<ReminderPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final Reminder _reminderModel = ModalRoute.of(context).settings.arguments;
-    if (_reminderModel != null) {
-      _reminder = _reminderModel;
-      _reminderType = _reminderModel.type;
+    final Schedule _scheduleModel = ModalRoute.of(context).settings.arguments;
+    if (_scheduleModel != null) {
+      _schedule = _scheduleModel;
+      _scheduleType = _scheduleModel.type;
     }
     if (!_initCompleted) {
       _titleController =
-          TextEditingController(text: _reminder != null ? _reminder.title : "");
+          TextEditingController(text: _schedule != null ? _schedule.title : "");
       _descriptionController = TextEditingController(
-          text: _reminder != null ? _reminder.description : "");
+          text: _schedule != null ? _schedule.description : "");
       _initCompleted = true;
     }
   }
 
   void saveToFirestore() {
-    print(_reminderType);
+    print(_scheduleType);
     if (_formKey.currentState.validate()) {
       FocusScope.of(context).unfocus();
 
       final firestoreDatabase =
           Provider.of<FirestoreDatabase>(context, listen: false);
 
-      firestoreDatabase.setreminder(Reminder(
-        id: _reminder != null ? _reminder.id : documentIdFromCurrentDate(),
+      firestoreDatabase.setSchedule(Schedule(
+        id: _schedule != null ? _schedule.id : documentIdFromCurrentDate(),
         title: _titleController.text,
         description: _descriptionController.text.length > 0
             ? _descriptionController.text
             : "",
-        type: _reminderType != "" ? _reminderType : "Other",
-        date: selectedDate,
+        type: _scheduleType != "" ? _scheduleType : "Other",
+        // date: selectedDate,
+        startTime: startTime,
+        endTime: endTime,
       ));
 
       Navigator.of(context).pop();
@@ -152,7 +159,7 @@ class _ReminderPageState extends State<ReminderPage> {
           elevation: 0,
           backgroundColor: Color(0xFFF6F6F6),
           title: Text(
-            _reminder != null ? kEditReminder : kAddReminder,
+            _schedule != null ? kEditReminder : kAddReminder,
             style: TextStyle(color: Colors.black),
           ),
           centerTitle: true,
@@ -193,7 +200,7 @@ class _ReminderPageState extends State<ReminderPage> {
                     child: Column(children: <Widget>[
                       ListTile(
                         title: Text(
-                          "Reminder Type",
+                          "Schedule Type",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         trailing:
@@ -201,13 +208,13 @@ class _ReminderPageState extends State<ReminderPage> {
                       ),
                       SizedBox(height: 10.0),
                       Container(
-                        child: ReminderTypeWidget(
-                          previousType: _reminderType,
+                        child: ScheduleTypeWidget(
+                          previousType: _scheduleType,
                           onValueChanged: (value) async {
                             if (value != "") {
                               setState(() {
                                 print(value);
-                                _reminderType = value;
+                                _scheduleType = value;
                               });
                             }
                           },
@@ -220,7 +227,6 @@ class _ReminderPageState extends State<ReminderPage> {
                     children: <Widget>[
                       Expanded(
                         child: InkWell(
-                          onTap: () => _selectDate(context),
                           child: Container(
                             padding: EdgeInsets.all(8.0),
                             margin: EdgeInsets.only(bottom: 20.0, right: 10.0),
@@ -236,7 +242,7 @@ class _ReminderPageState extends State<ReminderPage> {
                                   padding: const EdgeInsets.only(
                                       left: 8.0, top: 8.0),
                                   child: Text(
-                                    'Add a due date',
+                                    'Select Week Day',
                                     style: TextStyle(fontSize: 15.0),
                                   ),
                                 ),
@@ -244,8 +250,7 @@ class _ReminderPageState extends State<ReminderPage> {
                                   padding: const EdgeInsets.only(
                                       left: 8.0, top: 8.0),
                                   child: Text(
-                                    "${selectedDate.toLocal()}".split(' ')[0] +
-                                        "",
+                                    "${startTime.toLocal()}".split(' ')[0] + "",
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20.0),
@@ -259,7 +264,7 @@ class _ReminderPageState extends State<ReminderPage> {
                       Expanded(
                         child: InkWell(
                           onTap: () {
-                            _selectTime(context);
+                            _selectStartTime(context);
                           },
                           child: Container(
                             padding: EdgeInsets.all(8.0),
@@ -284,7 +289,7 @@ class _ReminderPageState extends State<ReminderPage> {
                                   padding: const EdgeInsets.only(
                                       left: 8.0, top: 8.0),
                                   child: Text(
-                                    "${selectedTime.format(context)}",
+                                    "${TimeOfDay.fromDateTime(startTime).format(context)}",
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20.0),
@@ -340,7 +345,7 @@ class _ReminderPageState extends State<ReminderPage> {
                                             "todosCreateEditTaskNameValidatorMsg")
                                         : null,
                                     decoration: InputDecoration(
-                                      hintText: "Enter Reminder Title",
+                                      hintText: "Enter Schedule Title",
                                       border: InputBorder.none,
                                     ),
                                     style: TextStyle(
@@ -377,7 +382,7 @@ class _ReminderPageState extends State<ReminderPage> {
                               controller: _descriptionController,
                               decoration: InputDecoration(
                                 hintText:
-                                    "Enter Description for the reminder...",
+                                    "Enter Description for the schedule...",
                                 border: InputBorder.none,
                               ),
                             ),
@@ -394,21 +399,21 @@ class _ReminderPageState extends State<ReminderPage> {
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.red,
           onPressed: () async {
-            Reminder _reminderToDelete =
+            Schedule _scheduleToDelete =
                 ModalRoute.of(context).settings.arguments;
-            print("delete:"+ _reminderToDelete.id);
-            if (_reminderToDelete != null) {
+            print("delete:" + _scheduleToDelete.id);
+            if (_scheduleToDelete != null) {
               final firestoreDatabase =
                   Provider.of<FirestoreDatabase>(context, listen: false);
-              firestoreDatabase.deleteReminder(_reminderToDelete);
-              
+              firestoreDatabase.deleteSchedule(_scheduleToDelete);
+
               _scaffoldKey.currentState.showSnackBar(
                 SnackBar(
                   backgroundColor: Theme.of(context).appBarTheme.color,
                   content: Text(
                     AppLocalizations.of(context)
                             .translate("todosSnackBarContent") +
-                        _reminderToDelete.title,
+                        _scheduleToDelete.title,
                     style: TextStyle(color: Theme.of(context).canvasColor),
                   ),
                   duration: Duration(seconds: 3),
@@ -417,7 +422,7 @@ class _ReminderPageState extends State<ReminderPage> {
                         .translate("todosSnackBarActionLbl"),
                     textColor: Theme.of(context).canvasColor,
                     onPressed: () {
-                      firestoreDatabase.setreminder(_reminderToDelete);
+                      firestoreDatabase.setSchedule(_scheduleToDelete);
                       Future.delayed(Duration(seconds: 3))
                           .then((value) => Navigator.pop(context));
                     },
@@ -437,18 +442,18 @@ class _ReminderPageState extends State<ReminderPage> {
   }
 }
 
-class ReminderTypeWidget extends StatefulWidget {
+class ScheduleTypeWidget extends StatefulWidget {
   final ValueChanged<String> onValueChanged;
   final String previousType;
 
-  ReminderTypeWidget({this.onValueChanged, this.previousType});
+  ScheduleTypeWidget({this.onValueChanged, this.previousType});
 
   @override
-  _ReminderTypeWidgetState createState() => _ReminderTypeWidgetState();
+  _ScheduleTypeWidgetState createState() => _ScheduleTypeWidgetState();
 }
 
-class _ReminderTypeWidgetState extends State<ReminderTypeWidget> {
-  String reminderType;
+class _ScheduleTypeWidgetState extends State<ScheduleTypeWidget> {
+  String ScheduleType;
   int _selectedIndex;
   List<ReminderTypeModel> _options = [
     ReminderTypeModel(title: 'Birthday', icon: Icons.cake),

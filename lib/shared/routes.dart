@@ -3,6 +3,7 @@ import 'package:timeplan/screens/authenticate/Login/login_screen.dart';
 import 'package:timeplan/screens/authenticate/Signup/signup_screen.dart';
 import 'package:timeplan/screens/home/home.dart';
 import 'package:timeplan/screens/reminderpage.dart';
+import 'package:timeplan/screens/scheduleaddpage.dart';
 
 class Routes {
   Routes._(); //this is to prevent anyone from instantiate this object
@@ -13,6 +14,7 @@ class Routes {
   static const String home = '/home';
   static const String setting = '/setting';
   static const String reminders_page = '/reminderspage';
+  static const String schedules_page = '/schedulespage';
 
   static final routes = <String, WidgetBuilder>{
     // splash: (BuildContext context) => SplashScreen(),
@@ -22,5 +24,6 @@ class Routes {
     reminders_page: (BuildContext context) => ReminderPage(),
     // setting: (BuildContext context) => SettingScreen(),
     // create_edit_todo: (BuildContext context) => CreateEditTodoScreen(),
+    schedules_page: (BuildContext context) => SchedulePage(),
   };
 }
