@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:timeplan/screens/authenticate/Login/components/background.dart';
 import 'package:timeplan/components/already_have_an_account_acheck.dart';
 import 'package:timeplan/components/rounded_button.dart';
+import 'package:timeplan/screens/authenticate/Signup/components/or_divider.dart';
+import 'package:timeplan/screens/authenticate/Signup/components/social_icon.dart';
 import 'package:timeplan/services/auth.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/shared/loading.dart';
@@ -9,9 +11,7 @@ import 'package:timeplan/shared/loading.dart';
 class Body extends StatefulWidget {
   final Function toggleView;
 
-  const Body({
-    Key key,this.toggleView
-  }) : super(key: key);
+  const Body({Key key, this.toggleView}) : super(key: key);
 
   @override
   _BodyState createState() => _BodyState();
@@ -113,7 +113,9 @@ class _BodyState extends State<Body> {
                               });
                             },
                             child: Icon(
-                              isObscure ? Icons.visibility : Icons.visibility_off,
+                              isObscure
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                               color: kPrimaryColor,
                             ),
                           ),
@@ -134,7 +136,7 @@ class _BodyState extends State<Body> {
                               loading = false;
                               error = 'Please supply a valid email';
                             });
-                          } 
+                          }
                         }
                       },
                     ),
@@ -144,8 +146,26 @@ class _BodyState extends State<Body> {
                       style: TextStyle(color: Colors.red, fontSize: 14.0),
                     ),
                     AlreadyHaveAnAccountCheck(
-                      press: () => widget.toggleView(),
+                      press: widget.toggleView,
                     ),
+                    OrDivider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        SocalIcon(
+                            iconSrc: "assets/icons/google-plus.svg",
+                            press: () async {
+                              setState(() => loading = true);
+                              dynamic result = await _auth.googleSignIn();
+                              if (result == null) {
+                                setState(() {
+                                  loading = false;
+                                  error = 'Please supply a valid email';
+                                });
+                              }
+                            }),
+                      ],
+                    )
                   ],
                 ),
               ),

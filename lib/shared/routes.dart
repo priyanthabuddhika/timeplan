@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:timeplan/screens/authenticate/Login/login_screen.dart';
 import 'package:timeplan/screens/authenticate/Signup/signup_screen.dart';
 import 'package:timeplan/screens/home/home.dart';
+import 'package:timeplan/screens/note_page.dart';
 import 'package:timeplan/screens/reminderpage.dart';
 import 'package:timeplan/screens/scheduleaddpage.dart';
 
@@ -15,6 +16,7 @@ class Routes {
   static const String setting = '/setting';
   static const String reminders_page = '/reminderspage';
   static const String schedules_page = '/schedulespage';
+  static const String notes_page = '/notespage';
 
   static final routes = <String, WidgetBuilder>{
     // splash: (BuildContext context) => SplashScreen(),
@@ -25,5 +27,6 @@ class Routes {
     // setting: (BuildContext context) => SettingScreen(),
     // create_edit_todo: (BuildContext context) => CreateEditTodoScreen(),
     schedules_page: (BuildContext context) => SchedulePage(),
+    notes_page: (BuildContext context) => NotePage(),
   };
 }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/date_model.dart';
-import 'package:timeplan/models/remider.dart';
+import 'package:timeplan/models/schedule.dart';
 import 'package:timeplan/screens/home/empty_content.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/services/app_localizations.dart';
+import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/shared/typeIcon.dart';
 
 class ScheduleViewWidget extends StatefulWidget {
@@ -26,18 +28,15 @@ class _ScheduleViewWidgetState extends State<ScheduleViewWidget> {
   List<DateModel> dates;
   DateTime date;
   int todayDateIs;
-  int _previousIndex;
 
   @override
   void initState() {
     super.initState();
-    final firestoreDatabase =
-        Provider.of<FirestoreDatabase>(context, listen: false);
+
     dates = new List<DateModel>();
     DateTime tempDate = DateTime.now();
     date = new DateTime(tempDate.year, tempDate.month, tempDate.day);
     todayDateIs = date.day;
-    _previousIndex = 0;
   }
 
   @override
@@ -61,67 +60,102 @@ class _ScheduleViewWidgetState extends State<ScheduleViewWidget> {
             child: Icon(Icons.calendar_today),
           ),
           SizedBox(width: 10.0),
-          Container(
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-            padding: EdgeInsets.all(8),
-            child: Icon(Icons.calendar_view_day),
+          InkWell(
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                '/fullschedulepage',
+              );
+            },
+            child: Container(
+              decoration:
+                  BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+              padding: EdgeInsets.all(8),
+              child: Icon(Icons.calendar_view_day),
+            ),
           )
         ]),
       ),
-      SizedBox(height: 10.0),
-      SizedBox(height: 10.0),
-      Container(
-        height: 60,
-        margin: EdgeInsets.only(left: 8.0),
-        child: _buildRemindersList(),
-      ),
+      kSizedBox,
+      kSizedBox,
+      Container(height: 200.0, child: _buildRemindersList()),
     ]);
   }
 
   Widget _buildRemindersList() {
+    DateTime day = DateTime.now();
+    String weekDay = DateFormat('EEEE').format(day);
+    print(weekDay);
     final _firestoreDatabase =
         Provider.of<FirestoreDatabase>(widget.context, listen: false);
     return StreamBuilder(
-      stream: _firestoreDatabase.remindersForDay(
-          day: date, datePlus: date.add(Duration(days: 1))),
+      stream: _firestoreDatabase.schedulesForDay(day: weekDay),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          List<Reminder> schedule = snapshot.data;
+          List<Schedule> schedule = snapshot.data;
           if (schedule.isNotEmpty) {
             return ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
-                  return Container(
-                    margin: EdgeInsets.only(right: 10.0),
-                    height: 60.0,
-                    width: 300.0,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10.0)),
-                    child: ListTile(
-                      title: Text(
-                        schedule[index].title,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                      subtitle: Row(
+                  return InkWell(
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/schedulespage',
+                          arguments: schedule[index]);
+                    },
+                    child: Container(
+                      width: 300,
+                      padding: EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 15.0),
+                      margin: EdgeInsets.only(
+                          right: 10.0, bottom: 15.0, left: 10.0, top: 10.0),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15.0)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.watch_later,
-                              color: Colors.grey, size: 12.0),
-                          SizedBox(width: 5.0),
+                          Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Icon(Icons.watch_later,
+                                  color: Colors.grey, size: 12.0),
+                              SizedBox(width: 5.0),
+                              Text(
+                                "${TimeOfDay.fromDateTime(schedule[index].startTime).format(context)} - ${TimeOfDay.fromDateTime(schedule[index].endTime).format(context)}",
+                                style: TextStyle(
+                                    color: Colors.grey, fontSize: 12.0),
+                              ),
+                              Spacer(),
+                              Icon(
+                                ReminderIcon.getReminderIcon(
+                                    schedule[index].type),
+                                color: kGradientColorOne,
+                              ),
+                            ],
+                          ),
                           Text(
-                            TimeOfDay.fromDateTime(
-                              schedule[index].date,
-                            ).format(context),
+                            schedule[index].title,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+                            style: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.bold),
+                          ),
+                          kSizedBox,
+                          Text(
+                            "View",
                             style:
-                                TextStyle(fontSize: 12.0, color: Colors.grey),
+                                TextStyle(fontSize: 10.0, color: Colors.grey),
+                          ),
+                          Text(
+                            schedule[index].description,
+                            maxLines: 5,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(),
                           ),
                         ],
                       ),
-                      trailing: Icon(
-                          ReminderIcon.getReminderIcon(schedule[index].type)),
                     ),
                   );
                 },

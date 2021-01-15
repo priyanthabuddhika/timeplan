@@ -22,11 +22,9 @@ class LanguageProvider extends ChangeNotifier {
   }
 
   void updateLanguage(String languageCode) {
-    if (languageCode == "zh") {
-      _appLocale = Locale("zh");
-    } else {
+    if (languageCode == "en") {
       _appLocale = Locale("en");
-    }
+    } 
 
     _sharedPrefsHelper.changeLanguage(languageCode);
     notifyListeners();

@@ -1,6 +1,5 @@
 import 'package:meta/meta.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:timeplan/models/remider.dart';
 
 /*
 This class represent all possible CRUD operation for Firestore.
@@ -27,8 +26,8 @@ class FirestoreService {
     @required List<Map<String, dynamic>> datas,
     bool merge = false,
   }) async {
-    final reference = FirebaseFirestore.instance.doc(path);
-    final batchSet = FirebaseFirestore.instance.batch();
+    // final reference = FirebaseFirestore.instance.doc(path);
+    // final batchSet = FirebaseFirestore.instance.batch();
 
 //    for()
 //    batchSet.

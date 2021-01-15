@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/user.dart';
 import 'package:timeplan/providers/auth_provider.dart';
@@ -7,11 +8,16 @@ import 'package:timeplan/providers/language_provider.dart';
 import 'package:timeplan/providers/theme_provider.dart';
 import 'package:timeplan/screens/auth_widget_builder.dart';
 import 'package:timeplan/screens/authenticate/Login/login_screen.dart';
+import 'package:timeplan/screens/authenticate/Signup/signup_screen.dart';
+import 'package:timeplan/screens/authenticate/authenticate.dart';
+import 'package:timeplan/screens/calendarpage.dart';
+import 'package:timeplan/screens/fullscheduolepage.dart';
 import 'package:timeplan/screens/home/home.dart';
+import 'package:timeplan/screens/note_page.dart';
+import 'package:timeplan/screens/reminderpage.dart';
+import 'package:timeplan/screens/scheduleaddpage.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:timeplan/services/firestore_database.dart';
-import 'package:timeplan/shared/app_themes.dart';
-import 'package:timeplan/shared/routes.dart';
 
 // class MyApp extends StatelessWidget {
 //   const MyApp({Key key, this.databaseBuilder}) : super(key: key);
@@ -76,7 +82,6 @@ class MyApp extends StatelessWidget {
                   //List of all supported locales
                   supportedLocales: [
                     Locale('en', 'US'),
-                    Locale('zh', 'CN'),
                   ],
                   //These delegates make sure that the localization data for the proper language is loaded
                   localizationsDelegates: [
@@ -102,17 +107,83 @@ class MyApp extends StatelessWidget {
                     return supportedLocales.first;
                   },
                   title: 'Timeplan',
-                  routes: Routes.routes,
-                  theme: AppThemes.lightTheme,
-                  darkTheme: AppThemes.darkTheme,
-                  themeMode: themeProviderRef.isDarkModeOn
-                      ? ThemeMode.dark
-                      : ThemeMode.light,
+                  // routes: Routes.routes,
+                  onGenerateRoute: (settings) {
+                    switch (settings.name) {
+                      case '/login':
+                        return PageTransition(
+                          child: LoginScreen(),
+                          type: PageTransitionType.scale,
+                          settings: settings,
+                        );
+                        break;
+                      case '/register':
+                        return PageTransition(
+                          child: SignUpScreen(),
+                          type: PageTransitionType.scale,
+                          settings: settings,
+                        );
+                        break;
+                      case '/home':
+                        return PageTransition(
+                          child: Home(),
+                          type: PageTransitionType.scale,
+                          settings: settings,
+                        );
+                        break;
+                      case '/notespage':
+                        return PageTransition(
+                          child: NotePage(),
+                          type: PageTransitionType.scale,
+                          settings: settings,
+                        );
+                        break;
+
+                      case '/schedulespage':
+                        return PageTransition(
+                          child: SchedulePage(),
+                          type: PageTransitionType.bottomToTop,
+                          settings: settings,
+                          duration: Duration(milliseconds: 400),
+                          reverseDuration: Duration(milliseconds: 300),
+                        );
+                        break;
+                      case '/reminderspage':
+                        return PageTransition(
+                          child: ReminderPage(),
+                          type: PageTransitionType.bottomToTop,
+                          settings: settings,
+                          duration: Duration(milliseconds: 400),
+                          reverseDuration: Duration(milliseconds: 300),
+                        );
+                        break;
+                      case '/calendarpage':
+                        return PageTransition(
+                          child: CalendarView(),
+                          type: PageTransitionType.rightToLeft,
+                          settings: settings,
+                          duration: Duration(milliseconds: 400),
+                          reverseDuration: Duration(milliseconds: 300),
+                        );
+                        break;
+                      case '/fullschedulepage':
+                        return PageTransition(
+                          child: FullSchedulePage(),
+                          type: PageTransitionType.rightToLeft,
+                          settings: settings,
+                          duration: Duration(milliseconds: 400),
+                          reverseDuration: Duration(milliseconds: 300),
+                        );
+                        break;
+                      default:
+                        return null;
+                    }
+                  },
                   home: Consumer<AuthProvider>(
                     builder: (_, authProviderRef, __) {
                       if (userSnapshot.connectionState ==
                           ConnectionState.active) {
-                        return userSnapshot.hasData ? Home() : LoginScreen();
+                        return userSnapshot.hasData ? Home() : Authenticate();
                       }
 
                       return Material(

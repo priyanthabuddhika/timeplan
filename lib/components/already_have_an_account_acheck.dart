@@ -12,6 +12,7 @@ class AlreadyHaveAnAccountCheck extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("worked");
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[

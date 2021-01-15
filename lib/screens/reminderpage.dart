@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/remindertype.dart';
@@ -18,7 +19,7 @@ class _ReminderPageState extends State<ReminderPage> {
   final _formKey = GlobalKey<FormState>();
   // DatabaseHelper _dbHelper = DatabaseHelper();
   Reminder _reminder;
-  
+
   TextEditingController _titleController;
   TextEditingController _descriptionController;
 
@@ -131,306 +132,352 @@ class _ReminderPageState extends State<ReminderPage> {
 
   @override
   Widget build(BuildContext context) {
-    // print(DateTime.now().toString());
-    // print(TimeOfDay.now().format(context));
     Size size = MediaQuery.of(context).size;
-    return GestureDetector(
-      onTap: () {
-        FocusScopeNode currentFocus = FocusScope.of(context);
 
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-        }
-      },
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: Color(0xFFF6F6F6),
-        appBar: AppBar(
-          iconTheme: IconThemeData(
-            color: Colors.black, //change your color here
-          ),
-          elevation: 0,
-          backgroundColor: Color(0xFFF6F6F6),
-          title: Text(
-            _reminder != null ? kEditReminder : kAddReminder,
-            style: TextStyle(color: Colors.black),
-          ),
-          centerTitle: true,
-          actions: [
-            GestureDetector(
-              child: Center(
-                  child: Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: Text(
-                  'Save',
-                  style: TextStyle(color: Colors.blue),
+    Future<bool> _onWillPop() {
+      if (_titleController.text != "") {
+        return showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(
+                  'Are you sure you want to leave?',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-              )),
-              onTap: () {
-                saveToFirestore();
-              },
-            )
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: SafeArea(
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 24.0),
-              color: Color(0xFFF6F6F6),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(
-                      bottom: 20.0,
-                      top: 20.0,
+                content: Text('Your reminder will not be saved'),
+                actions: <Widget>[
+                  FlatButton(
+                    onPressed: () {
+                      // saveToFirestore();
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Text(
+                      'Save & exit',
+                      style: TextStyle(color: Colors.blue),
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(10), //Color(0xFFF6F6F6),
-                    ),
-                    child: Column(children: <Widget>[
-                      ListTile(
-                        title: Text(
-                          "Reminder Type",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        trailing:
-                            IconButton(icon: Icon(Icons.add), onPressed: null),
-                      ),
-                      SizedBox(height: 10.0),
-                      Container(
-                        child: ReminderTypeWidget(
-                          previousType: _reminderType,
-                          onValueChanged: (value) async {
-                            if (value != "") {
-                              setState(() {
-                                print(value);
-                                _reminderType = value;
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 10.0),
-                    ]),
                   ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: InkWell(
-                          onTap: () => _selectDate(context),
-                          child: Container(
-                            padding: EdgeInsets.all(8.0),
-                            margin: EdgeInsets.only(bottom: 20.0, right: 10.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(
-                                  10), //Color(0xFFF6F6F6),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0, top: 8.0),
-                                  child: Text(
-                                    'Add a due date',
-                                    style: TextStyle(fontSize: 15.0),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0, top: 8.0),
-                                  child: Text(
-                                    "${selectedDate.toLocal()}".split(' ')[0] +
-                                        "",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20.0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () {
-                            _selectTime(context);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(8.0),
-                            margin: EdgeInsets.only(bottom: 20.0, left: 10.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(
-                                  10), //Color(0xFFF6F6F6),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0, top: 8.0),
-                                  child: Text(
-                                    'Select Time',
-                                    style: TextStyle(fontSize: 15.0),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0, top: 8.0),
-                                  child: Text(
-                                    "${selectedTime.format(context)}",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20.0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(8.0),
-                    margin: EdgeInsets.only(
-                      bottom: 20.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(10), //Color(0xFFF6F6F6),
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0, top: 8.0),
-                            child: Text(
-                              'Title',
-                              style: TextStyle(fontSize: 15.0),
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.symmetric(vertical: 10),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            width: size.width * 0.9,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(29),
-                                border: Border.all(color: Colors.blueAccent)),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: TextFormField(
-                                    controller: _titleController,
-                                    focusNode: _titleFocus,
-                                    onFieldSubmitted: (value) =>
-                                        _descriptionFocus.requestFocus(),
-                                    validator: (value) => value.isEmpty
-                                        ? AppLocalizations.of(context).translate(
-                                            "todosCreateEditTaskNameValidatorMsg")
-                                        : null,
-                                    decoration: InputDecoration(
-                                      hintText: "Enter Reminder Title",
-                                      border: InputBorder.none,
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF211551),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0, top: 8.0),
-                            child: Text(
-                              'Description',
-                              style: TextStyle(fontSize: 15.0),
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.symmetric(vertical: 10),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            width: size.width * 0.9,
-                            height: 100,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(29),
-                                border: Border.all(color: Colors.blueAccent)),
-                            child: TextFormField(
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              maxLines: 15,
-                              focusNode: _descriptionFocus,
-                              // onChanged: (value) async {},
-                              controller: _descriptionController,
-                              decoration: InputDecoration(
-                                hintText:
-                                    "Enter Description for the reminder...",
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                  FlatButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    /*Navigator.of(context).pop(true)*/
+                    child: Text(
+                      'Yes',
+                      style: TextStyle(color: Colors.red),
                     ),
                   ),
                 ],
               ),
+            ) ??
+            false;
+      } else {
+        return Future.delayed(Duration(milliseconds: 1), () {
+          return true;
+        });
+      }
+    }
+
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: Color(0xFFF6F6F6),
+          appBar: AppBar(
+            iconTheme: IconThemeData(
+              color: Colors.black, //change your color here
+            ),
+            elevation: 0,
+            backgroundColor: Color(0xFFF6F6F6),
+            title: Text(
+              _reminder != null ? kEditReminder : kAddReminder,
+              style: TextStyle(color: Colors.black),
+            ),
+            centerTitle: true,
+            actions: [
+              GestureDetector(
+                child: Center(
+                    child: Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: Text(
+                    'Save',
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                )),
+                onTap: () {
+                  saveToFirestore();
+                },
+              )
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: SafeArea(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 24.0),
+                color: Color(0xFFF6F6F6),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(
+                        bottom: 20.0,
+                        top: 20.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.circular(10), //Color(0xFFF6F6F6),
+                      ),
+                      child: Column(children: <Widget>[
+                        ListTile(
+                          title: Text(
+                            "Reminder Type",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          trailing: IconButton(
+                              icon: Icon(Icons.add), onPressed: null),
+                        ),
+                        SizedBox(height: 10.0),
+                        Container(
+                          child: ReminderTypeWidget(
+                            previousType: _reminderType,
+                            onValueChanged: (value) async {
+                              if (value != "") {
+                                setState(() {
+                                  print(value);
+                                  _reminderType = value;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 10.0),
+                      ]),
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => _selectDate(context),
+                            child: Container(
+                              padding: EdgeInsets.all(8.0),
+                              margin:
+                                  EdgeInsets.only(bottom: 20.0, right: 10.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(
+                                    10), //Color(0xFFF6F6F6),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 8.0, top: 8.0),
+                                    child: Text(
+                                      'Add a due date',
+                                      style: TextStyle(fontSize: 15.0),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 8.0, top: 8.0),
+                                    child: Text(
+                                      "${selectedDate.toLocal()}"
+                                              .split(' ')[0] +
+                                          "",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20.0),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              _selectTime(context);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(8.0),
+                              margin: EdgeInsets.only(bottom: 20.0, left: 10.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(
+                                    10), //Color(0xFFF6F6F6),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 8.0, top: 8.0),
+                                    child: Text(
+                                      'Select Time',
+                                      style: TextStyle(fontSize: 15.0),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 8.0, top: 8.0),
+                                    child: Text(
+                                      "${selectedTime.format(context)}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20.0),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(8.0),
+                      margin: EdgeInsets.only(
+                        bottom: 20.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.circular(10), //Color(0xFFF6F6F6),
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 8.0, top: 8.0),
+                              child: Text(
+                                'Title',
+                                style: TextStyle(fontSize: 15.0),
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.symmetric(vertical: 10),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              width: size.width * 0.9,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(29),
+                                  border: Border.all(color: Colors.blueAccent)),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _titleController,
+                                      focusNode: _titleFocus,
+                                      onFieldSubmitted: (value) =>
+                                          _descriptionFocus.requestFocus(),
+                                      validator: (value) => value.isEmpty
+                                          ? AppLocalizations.of(context).translate(
+                                              "todosCreateEditTaskNameValidatorMsg")
+                                          : null,
+                                      decoration: InputDecoration(
+                                        hintText: "Enter Reminder Title",
+                                        border: InputBorder.none,
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF211551),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 8.0, top: 8.0),
+                              child: Text(
+                                'Description',
+                                style: TextStyle(fontSize: 15.0),
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.symmetric(vertical: 10),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              width: size.width * 0.9,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(29),
+                                  border: Border.all(color: Colors.blueAccent)),
+                              child: TextFormField(
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                maxLines: 15,
+                                focusNode: _descriptionFocus,
+                                // onChanged: (value) async {},
+                                controller: _descriptionController,
+                                decoration: InputDecoration(
+                                  hintText:
+                                      "Enter Description for the reminder...",
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.red,
-          onPressed: () async {
-            Reminder _reminderToDelete =
-                ModalRoute.of(context).settings.arguments;
-            print("delete:"+ _reminderToDelete.id);
-            if (_reminderToDelete != null) {
-              final firestoreDatabase =
-                  Provider.of<FirestoreDatabase>(context, listen: false);
-              firestoreDatabase.deleteReminder(_reminderToDelete);
-              
-              _scaffoldKey.currentState.showSnackBar(
-                SnackBar(
-                  backgroundColor: Theme.of(context).appBarTheme.color,
-                  content: Text(
-                    AppLocalizations.of(context)
-                            .translate("todosSnackBarContent") +
-                        _reminderToDelete.title,
-                    style: TextStyle(color: Theme.of(context).canvasColor),
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.red,
+            onPressed: () async {
+              Reminder _reminderToDelete =
+                  ModalRoute.of(context).settings.arguments;
+              print("delete:" + _reminderToDelete.id);
+              if (_reminderToDelete != null) {
+                final firestoreDatabase =
+                    Provider.of<FirestoreDatabase>(context, listen: false);
+                firestoreDatabase.deleteReminder(_reminderToDelete);
+
+                _scaffoldKey.currentState.showSnackBar(
+                  SnackBar(
+                    backgroundColor: Theme.of(context).appBarTheme.color,
+                    content: Text(
+                      AppLocalizations.of(context)
+                              .translate("todosSnackBarContent") +
+                          _reminderToDelete.title,
+                      style: TextStyle(color: Theme.of(context).canvasColor),
+                    ),
+                    duration: Duration(seconds: 3),
+                    action: SnackBarAction(
+                      label: AppLocalizations.of(context)
+                          .translate("todosSnackBarActionLbl"),
+                      textColor: Theme.of(context).canvasColor,
+                      onPressed: () {
+                        firestoreDatabase.setreminder(_reminderToDelete);
+                        Future.delayed(Duration(seconds: 3))
+                            .then((value) => Navigator.pop(context));
+                      },
+                    ),
                   ),
-                  duration: Duration(seconds: 3),
-                  action: SnackBarAction(
-                    label: AppLocalizations.of(context)
-                        .translate("todosSnackBarActionLbl"),
-                    textColor: Theme.of(context).canvasColor,
-                    onPressed: () {
-                      firestoreDatabase.setreminder(_reminderToDelete);
-                      Future.delayed(Duration(seconds: 3))
-                          .then((value) => Navigator.pop(context));
-                    },
-                  ),
-                ),
-              );
-              Future.delayed(Duration(seconds: 3))
-                  .then((value) => Navigator.pop(context));
-            } else {
-              Navigator.pop(context);
-            }
-          },
-          child: Icon(Icons.delete_forever),
+                );
+                Future.delayed(Duration(seconds: 3))
+                    .then((value) => Navigator.pop(context));
+              } else {
+                Navigator.pop(context);
+              }
+            },
+            child: Icon(Icons.delete_forever),
+          ),
         ),
       ),
     );

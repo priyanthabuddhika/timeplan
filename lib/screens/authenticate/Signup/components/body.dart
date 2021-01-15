@@ -104,7 +104,9 @@ class _BodyState extends State<Body> {
                               });
                             },
                             child: Icon(
-                              isObscure ? Icons.visibility : Icons.visibility_off,
+                              isObscure
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                               color: kPrimaryColor,
                             ),
                           ),
@@ -142,17 +144,17 @@ class _BodyState extends State<Body> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         SocalIcon(
-                          iconSrc: "assets/icons/facebook.svg",
-                          press: () {},
-                        ),
-                        SocalIcon(
-                          iconSrc: "assets/icons/twitter.svg",
-                          press: () {},
-                        ),
-                        SocalIcon(
-                          iconSrc: "assets/icons/google-plus.svg",
-                          press:() => widget.toggleView(),
-                        ),
+                            iconSrc: "assets/icons/google-plus.svg",
+                            press: () async {
+                              setState(() => loading = true);
+                              dynamic result = await _auth.googleSignIn();
+                              if (result == null) {
+                                setState(() {
+                                  loading = false;
+                                  error = 'Please supply a valid email';
+                                });
+                              }
+                            }),
                       ],
                     )
                   ],

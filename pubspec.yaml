@@ -47,7 +47,8 @@ dependencies:
   
   table_calendar: ^2.3.2
   timeline_tile: ^1.0.0
-  weekday_selector: ^0.4.0
+  flutter_speed_dial: ^1.2.5
+  page_transition: ^1.1.7+6
   
 dev_dependencies:
   flutter_test:

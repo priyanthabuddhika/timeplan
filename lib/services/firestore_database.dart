@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
+import 'package:timeplan/models/note.dart';
 import 'package:timeplan/models/remider.dart';
 import 'package:timeplan/models/schedule.dart';
 import 'package:timeplan/services/firestore_path.dart';
@@ -29,6 +31,12 @@ class FirestoreDatabase {
         data: schedule.toMap(),
       );
 
+  //Method to create/update note
+  Future<void> setNote(Note note) async => await _firestoreService.setData(
+        path: FirestorePath.note(uid, note.id),
+        data: note.toMap(),
+      );
+
   //Method to delete reminderModel entry
   Future<void> deleteReminder(Reminder reminder) async {
     await _firestoreService.deleteData(
@@ -39,6 +47,11 @@ class FirestoreDatabase {
   Future<void> deleteSchedule(Schedule schedule) async {
     await _firestoreService.deleteData(
         path: FirestorePath.schedule(uid, schedule.id));
+  }
+
+  //Method to delete schedule entry
+  Future<void> deleteNote(Note note) async {
+    await _firestoreService.deleteData(path: FirestorePath.note(uid, note.id));
   }
 
   //Method to retrieve reminderModel object based on the given reminderId
@@ -52,6 +65,13 @@ class FirestoreDatabase {
       _firestoreService.documentStream(
         path: FirestorePath.schedule(uid, id),
         builder: (data, id) => Schedule.fromMap(data, id),
+      );
+
+  //Method to retrieve note object based on the given id
+  Stream<Note> noteStream({@required String id}) =>
+      _firestoreService.documentStream(
+        path: FirestorePath.note(uid, id),
+        builder: (data, id) => Note.fromMap(data, id),
       );
 
   //Method to retrieve all reminders item from the same user based on uid
@@ -68,6 +88,12 @@ class FirestoreDatabase {
         builder: (data, documentId) => Schedule.fromMap(data, documentId),
       );
 
+  //Method to retrieve all notes item from the same user based on uid
+  Stream<List<Note>> notesStream() => _firestoreService.collectionStream(
+        path: FirestorePath.notes(uid),
+        builder: (data, documentId) => Note.fromMap(data, documentId),
+      );
+
   // Method to retrieve schedule list for day
   Stream<List<Schedule>> schedulesForDay({String day}) {
     return _firestoreService.collectionStream(
@@ -78,6 +104,7 @@ class FirestoreDatabase {
       builder: (data, documentId) => Schedule.fromMap(data, documentId),
     );
   }
+
   // Method to retrieve reminders list for day
   Stream<List<Reminder>> remindersForDay({DateTime day, DateTime datePlus}) {
     print(day.toString());
@@ -96,17 +123,16 @@ class FirestoreDatabase {
   }
 
   // Method to retrieve next event for day
-  Stream<List<Reminder>> nextEvent({DateTime day}) {
-    print(day.toString());
-    String date = day.toString();
+  Stream<List<Schedule>> nextEvent({DateTime day}) {
+    String weekDay = DateFormat('EEEE').format(day);
     // Timestamp date = Timestamp.fromDate(day);
     // Timestamp.fromDate(datePlus);
     return _firestoreService.collectionStream(
       queryBuilder: (query) {
-        return query.where("date", isGreaterThanOrEqualTo: date);
+        return query.where("date", isGreaterThanOrEqualTo: weekDay);
       },
-      path: FirestorePath.reminders(uid),
-      builder: (data, documentId) => Reminder.fromMap(data, documentId),
+      path: FirestorePath.schedules(uid),
+      builder: (data, documentId) => Schedule.fromMap(data, documentId),
     );
   }
 
