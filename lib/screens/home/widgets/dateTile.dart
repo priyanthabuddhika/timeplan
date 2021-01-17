@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:timeplan/shared/constants.dart';
 
 class DateTile extends StatelessWidget {
-  String weekDay;
-  String date;
-  bool isSelected;
-  double textSize;
+  final String weekDay;
+  final String date;
+  final bool isSelected;
+  final double textSize;
   DateTile({this.weekDay, this.date, this.isSelected, this.textSize});
 
   @override

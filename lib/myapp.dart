@@ -14,10 +14,12 @@ import 'package:timeplan/screens/calendarpage.dart';
 import 'package:timeplan/screens/fullscheduolepage.dart';
 import 'package:timeplan/screens/home/home.dart';
 import 'package:timeplan/screens/note_page.dart';
+import 'package:timeplan/screens/notesfullpage.dart';
 import 'package:timeplan/screens/reminderpage.dart';
 import 'package:timeplan/screens/scheduleaddpage.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:timeplan/services/firestore_database.dart';
+import 'package:timeplan/shared/constants.dart';
 
 // class MyApp extends StatelessWidget {
 //   const MyApp({Key key, this.databaseBuilder}) : super(key: key);
@@ -107,6 +109,11 @@ class MyApp extends StatelessWidget {
                     return supportedLocales.first;
                   },
                   title: 'Timeplan',
+                  theme: ThemeData(
+                      primaryColor: Color(0xFF7113D0),
+                      primaryColorLight: kPrimaryColor,
+                      accentColor: kPrimaryColor,
+                      timePickerTheme: TimePickerThemeData()),
                   // routes: Routes.routes,
                   onGenerateRoute: (settings) {
                     switch (settings.name) {
@@ -169,6 +176,15 @@ class MyApp extends StatelessWidget {
                       case '/fullschedulepage':
                         return PageTransition(
                           child: FullSchedulePage(),
+                          type: PageTransitionType.rightToLeft,
+                          settings: settings,
+                          duration: Duration(milliseconds: 400),
+                          reverseDuration: Duration(milliseconds: 300),
+                        );
+                        break;
+                      case '/notesfullpage':
+                        return PageTransition(
+                          child: NotesFullPage(),
                           type: PageTransitionType.rightToLeft,
                           settings: settings,
                           duration: Duration(milliseconds: 400),

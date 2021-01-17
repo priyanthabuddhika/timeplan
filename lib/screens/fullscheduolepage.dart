@@ -91,19 +91,7 @@ class _FullSchedulePageState extends State<FullSchedulePage>
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        actions: [
-          GestureDetector(
-            child: Center(
-                child: Padding(
-              padding: const EdgeInsets.only(right: 10.0),
-              child: Text(
-                'Save',
-                style: TextStyle(color: Colors.blue),
-              ),
-            )),
-            onTap: () {},
-          )
-        ],
+        actions: [],
       ),
       body: SafeArea(
         child: Padding(
@@ -112,6 +100,7 @@ class _FullSchedulePageState extends State<FullSchedulePage>
           child: Column(children: <Widget>[
             Container(
               height: 60,
+              margin: EdgeInsets.only(left: 10.0),
               child: ListView.builder(
                   itemCount: _weekdays.length,
                   shrinkWrap: true,
@@ -183,11 +172,7 @@ class _FullSchedulePageState extends State<FullSchedulePage>
               ),
             ),
             SizedBox(height: 15.0),
-            Container(
-              height: 60,
-              margin: EdgeInsets.only(left: 8.0),
-              child: _buildRemiderList(),
-            ),
+            Expanded(child: _buildRemiderList()),
           ]),
         ),
       ),
@@ -208,7 +193,7 @@ class _FullSchedulePageState extends State<FullSchedulePage>
                     itemBuilder: (context, index) {
                       return TimelineTile(
                         alignment: TimelineAlign.manual,
-                        lineXY: 0.2,
+                        lineXY: 0.3,
                         isFirst: index == 0,
                         isLast: !(index < schedule.length - 1),
                         afterLineStyle: LineStyle(thickness: 1),
@@ -227,24 +212,26 @@ class _FullSchedulePageState extends State<FullSchedulePage>
                           child: Column(
                             children: [
                               SizedBox(
-                                height: 10.0,
+                                height: 30.0,
                               ),
                               Text(
                                 TimeOfDay.fromDateTime(
                                         schedule[index].startTime)
                                     .format(context),
-                                style: TextStyle(fontSize: 20),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
+                              kSizedBox,
                               Text(
                                 TimeOfDay.fromDateTime(schedule[index].endTime)
                                     .format(context),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
                         ),
                         endChild: InkWell(
                           onTap: () {
-                            Navigator.of(context).pushNamed('/reminderspage',
+                            Navigator.of(context).pushNamed('/schedulespage',
                                 arguments: schedule[index]);
                           },
                           child: Container(
@@ -254,60 +241,47 @@ class _FullSchedulePageState extends State<FullSchedulePage>
                                 left: 10.0,
                                 top: 10.0),
                             padding: EdgeInsets.only(
-                                left: 15.0,
-                                right: 15.0,
-                                bottom: 15.0,
-                                top: 10.0),
+                              left: 15.0,
+                              right: 15.0,
+                              bottom: 15.0,
+                            ),
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(15.0)),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Icon(Icons.watch_later,
-                                        color: Colors.grey, size: 12.0),
-                                    SizedBox(width: 5.0),
-                                    Text(
-                                      TimeOfDay.fromDateTime(
-                                        schedule[index].startTime,
-                                      ).format(context),
-                                      style: TextStyle(
-                                          fontSize: 12.0,
-                                          color: Colors.grey,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Spacer(),
-                                    Icon(
-                                      ReminderIcon.getReminderIcon(
-                                          schedule[index].type),
-                                      color: kGradientColorOne,
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  schedule[index].title,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 3,
-                                  style: TextStyle(
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold),
+                                ListTile(
+                                  contentPadding: EdgeInsets.all(0),
+                                  title: Text(
+                                    schedule[index].title,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 3,
+                                    style: TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  trailing: Icon(
+                                    ReminderIcon.getReminderIcon(
+                                        schedule[index].type),
+                                    color: kGradientColorOne,
+                                  ),
                                 ),
                                 kSizedBox,
-                                Text(
-                                  "View",
-                                  style: TextStyle(
-                                      fontSize: 10.0, color: Colors.grey),
+                                Expanded(
+                                  child: Text(
+                                    "View",
+                                    style: TextStyle(
+                                        fontSize: 10.0, color: Colors.grey),
+                                  ),
                                 ),
-                                Text(
-                                  schedule[index].description,
-                                  maxLines: 5,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(),
+                                Expanded(
+                                  child: Text(
+                                    schedule[index].description,
+                                    maxLines: 5,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(),
+                                  ),
                                 ),
                               ],
                             ),

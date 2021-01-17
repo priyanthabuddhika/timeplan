@@ -5,6 +5,7 @@ import 'package:timeplan/models/schedule.dart';
 import 'package:timeplan/models/user.dart';
 import 'package:timeplan/providers/auth_provider.dart';
 import 'package:timeplan/screens/home/empty_content.dart';
+import 'package:timeplan/screens/home/widgets/NoteViewWidget.dart';
 import 'package:timeplan/screens/home/widgets/RemindersViewWidget.dart';
 import 'package:timeplan/screens/home/widgets/ScheduleViewWidget.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -111,7 +112,6 @@ class Home extends StatelessWidget {
       child: Container(
           padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               _buildAppBar(context),
@@ -120,8 +120,9 @@ class Home extends StatelessWidget {
               kSizedBox,
               RemindersViewWidget(context: context),
               kSizedBox,
-              kSizedBox,
               ScheduleViewWidget(context: context),
+              kSizedBox,
+              NoteViewWidget(context: context),
             ],
           )),
     );

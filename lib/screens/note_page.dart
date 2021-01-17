@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -110,8 +109,9 @@ class _NotePageState extends State<NotePage> {
                     ),
                   ),
                   FlatButton(
-                    onPressed: () => exit(0),
-                    /*Navigator.of(context).pop(true)*/
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
                     child: Text(
                       'Yes',
                       style: TextStyle(color: Colors.red),
@@ -263,28 +263,29 @@ class _NotePageState extends State<NotePage> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                     ),
-                                    Container(
-                                      margin:
-                                          EdgeInsets.symmetric(vertical: 10),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 5),
-                                      width: size.width * 0.9,
-                                      height: 200,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(29),
-                                          border: Border.all(
-                                              color: Colors.blueAccent)),
-                                      child: TextFormField(
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                        maxLines: 30,
-                                        focusNode: _descriptionFocus,
-                                        // onChanged: (value) async {},
-                                        controller: _descriptionController,
-                                        decoration: InputDecoration(
-                                          hintText: "Enter Description...",
-                                          border: InputBorder.none,
+                                    Expanded(
+                                      child: Container(
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 5),
+                                        width: size.width * 0.9,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(29),
+                                            border: Border.all(
+                                                color: Colors.blueAccent)),
+                                        child: TextFormField(
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                          maxLines: 30,
+                                          focusNode: _descriptionFocus,
+                                          // onChanged: (value) async {},
+                                          controller: _descriptionController,
+                                          decoration: InputDecoration(
+                                            hintText: "Enter Description...",
+                                            border: InputBorder.none,
+                                          ),
                                         ),
                                       ),
                                     ),

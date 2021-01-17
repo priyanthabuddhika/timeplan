@@ -94,15 +94,18 @@ class _CalendarViewState extends State<CalendarView>
     return Scaffold(
       backgroundColor: kPrimaryBackgroundColor,
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.black, //change your color here
+        ),
         elevation: 0.0,
-        backgroundColor: kPrimaryBackgroundColor,
+        backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
           DateFormat.yMMMM("en_US").format(
               _calendarController.focusedDay != null
                   ? _calendarController.focusedDay
                   : currentDate),
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
       body: StreamBuilder(

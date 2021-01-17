@@ -9,6 +9,6 @@ class FirestorePath {
   static String reminders(String uid) => 'users/$uid/reminders';
   static String schedule(String uid, String scheduleId) => 'users/$uid/schedules/$scheduleId';
   static String schedules(String uid) => 'users/$uid/schedules';
-  static String note(String uid, String noteId) => 'users/$uid/schedules/$noteId';
+  static String note(String uid, String noteId) => 'users/$uid/notes/$noteId';
   static String notes(String uid) => 'users/$uid/notes';
 }
