@@ -10,13 +10,10 @@ class NotesFullPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final firestoreDatabase =
-        Provider.of<FirestoreDatabase>(context, listen: false);
 
     return Scaffold(
       key: _scaffoldKey,
-      body: WillPopScope(
-          onWillPop: () async => false, child: _buildBodySection(context)),
+      body: _buildBodySection(context),
     );
   }
 
@@ -48,7 +45,7 @@ class NotesFullPage extends StatelessWidget {
                       firestoreDatabase.deleteNote(notes[index]);
 
                       _scaffoldKey.currentState.showSnackBar(SnackBar(
-                        backgroundColor: Theme.of(context).appBarTheme.color,
+                   
                         content: Text(
                           AppLocalizations.of(context)
                                   .translate("todosSnackBarContent") +

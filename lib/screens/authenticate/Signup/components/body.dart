@@ -38,14 +38,24 @@ class _BodyState extends State<Body> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text(
-                      "SIGNUP",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
                     SizedBox(height: size.height * 0.03),
                     Image.asset(
                       'assets/images/logoimg.png',
-                      height: size.height * 0.35,
+                      height: size.height * 0.2,
+                    ),
+                    SizedBox(height: size.height * 0.03),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(width: size.width * 0.1),
+                        Text(
+                          "Sign up",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 30.0,
+                              color: kPrimaryColor),
+                        ),
+                      ],
                     ),
                     Container(
                       margin: EdgeInsets.symmetric(vertical: 10),
@@ -130,7 +140,7 @@ class _BodyState extends State<Body> {
                         }
                       },
                     ),
-                    SizedBox(height: size.height * 0.03),
+                    SizedBox(height: size.height * 0.01),
                     Text(
                       error,
                       style: TextStyle(color: Colors.red, fontSize: 14.0),

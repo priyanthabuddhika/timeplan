@@ -42,20 +42,26 @@ class _BodyState extends State<Body> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text(
-                      "LOGIN",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
                     SizedBox(height: size.height * 0.03),
                     Image.asset(
                       'assets/images/logoimg.png',
-                      height: size.height * 0.35,
+                      height: size.height * 0.2,
                     ),
-                    // SvgPicture.asset(
-                    //   "assets/icons/login.svg",
-                    //   height: size.height * 0.35,
-                    // ),
                     SizedBox(height: size.height * 0.03),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(width: size.width * 0.1),
+                        Text(
+                          "Log in",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 30.0,
+                              color: kPrimaryColor),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: size.height * 0.01),
                     Container(
                       margin: EdgeInsets.symmetric(vertical: 10),
                       padding:
@@ -123,35 +129,30 @@ class _BodyState extends State<Body> {
                         ),
                       ),
                     ),
-
-                    RoundedButton(
-                      text: "LOGIN",
-                      press: () async {
-                        if (_formKey.currentState.validate()) {
-                          setState(() => loading = true);
-                          dynamic result = await _auth
-                              .signInWithEmailAndPassword(email, password);
-                          if (result == null) {
-                            setState(() {
-                              loading = false;
-                              error = 'Please supply a valid email';
-                            });
-                          }
-                        }
-                      },
-                    ),
                     SizedBox(height: size.height * 0.03),
-                    Text(
-                      error,
-                      style: TextStyle(color: Colors.red, fontSize: 14.0),
-                    ),
-                    AlreadyHaveAnAccountCheck(
-                      press: widget.toggleView,
-                    ),
-                    OrDivider(),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(width: size.width * 0.1),
+                        Expanded(
+                          child: RoundedButton(
+                            text: "Log in",
+                            press: () async {
+                              if (_formKey.currentState.validate()) {
+                                setState(() => loading = true);
+                                dynamic result =
+                                    await _auth.signInWithEmailAndPassword(
+                                        email, password);
+                                if (result == null) {
+                                  setState(() {
+                                    loading = false;
+                                    error = 'Please supply a valid email';
+                                  });
+                                }
+                              }
+                            },
+                          ),
+                        ),
                         SocalIcon(
                             iconSrc: "assets/icons/google-plus.svg",
                             press: () async {
@@ -164,8 +165,17 @@ class _BodyState extends State<Body> {
                                 });
                               }
                             }),
+                        SizedBox(width: size.width * 0.1),
                       ],
-                    )
+                    ),
+                    SizedBox(height: size.height * 0.03),
+                    Text(
+                      error,
+                      style: TextStyle(color: Colors.red, fontSize: 14.0),
+                    ),
+                    AlreadyHaveAnAccountCheck(
+                      press: widget.toggleView,
+                    ),
                   ],
                 ),
               ),

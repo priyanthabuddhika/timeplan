@@ -1,4 +1,4 @@
-
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/note.dart';
@@ -89,38 +89,24 @@ class _NotePageState extends State<NotePage> {
 
     Future<bool> _onWillPop() {
       if (_titleController.text != "") {
-        return showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text(
-                  'Are you sure you want to leave?',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                content: Text('Your note will not be saved'),
-                actions: <Widget>[
-                  FlatButton(
-                    onPressed: () {
-                      saveToFirestore();
-                      Navigator.of(context).pop(false);
-                    },
-                    child: Text(
-                      'Save & exit',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ),
-                  FlatButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(true);
-                    },
-                    child: Text(
-                      'Yes',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ],
-              ),
-            ) ??
-            false;
+        return CoolAlert.show(
+          context: context,
+          type: CoolAlertType.confirm,
+          text: "Your note will not be saved",
+          cancelBtnText: "Save",
+          onCancelBtnTap: () {
+            saveToFirestore();
+            Navigator.of(context).pop(true);
+          },
+          confirmBtnColor: Colors.red,
+          confirmBtnText: "Yes",
+          cancelBtnTextStyle:
+              TextStyle(color: kGradientColorOne, fontWeight: FontWeight.bold),
+          onConfirmBtnTap: () {
+            Navigator.of(context).pop(true);
+            Navigator.of(context).pop(true);
+          },
+        );
       } else {
         return Future.delayed(Duration(milliseconds: 1), () {
           return true;
@@ -157,10 +143,11 @@ class _NotePageState extends State<NotePage> {
                 GestureDetector(
                   child: Center(
                       child: Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
+                    padding: const EdgeInsets.only(right: 20.0),
                     child: Text(
                       'Save',
-                      style: TextStyle(color: Colors.blue),
+                      style: TextStyle(
+                          color: kPrimaryColor, fontWeight: FontWeight.bold),
                     ),
                   )),
                   onTap: () {
@@ -172,131 +159,95 @@ class _NotePageState extends State<NotePage> {
             body: SingleChildScrollView(
               child: SafeArea(
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 24.0),
-                  color: Color(0xFFF6F6F6),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(
-                          bottom: 20.0,
-                          top: 20.0,
+                  height: size.height * 0.8,
+                  width: size.width * 0.9,
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 20.0,
+                  ),
+                  padding: EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:
+                        BorderRadius.circular(10), //Color(0xFFF6F6F6),
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                          child: Text(
+                            'Title',
+                            style: TextStyle(
+                                fontSize: 15.0, fontWeight: FontWeight.bold),
+                          ),
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(10), //Color(0xFFF6F6F6),
-                        ),
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              padding: EdgeInsets.all(8.0),
-                              margin: EdgeInsets.only(
-                                bottom: 20.0,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(
-                                    10), //Color(0xFFF6F6F6),
-                              ),
-                              child: Form(
-                                key: _formKey,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 8.0, top: 8.0),
-                                      child: Text(
-                                        'Title',
-                                        style: TextStyle(
-                                            fontSize: 15.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin:
-                                          EdgeInsets.symmetric(vertical: 10),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 5),
-                                      width: size.width * 0.9,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(29),
-                                          border: Border.all(
-                                              color: Colors.blueAccent)),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: TextFormField(
-                                              controller: _titleController,
-                                              focusNode: _titleFocus,
-                                              onFieldSubmitted: (value) =>
-                                                  _descriptionFocus
-                                                      .requestFocus(),
-                                              validator: (value) => value
-                                                      .isEmpty
-                                                  ? AppLocalizations.of(context)
-                                                      .translate(
-                                                          "todosCreateEditTaskNameValidatorMsg")
-                                                  : null,
-                                              decoration: InputDecoration(
-                                                hintText: "Enter Title",
-                                                border: InputBorder.none,
-                                              ),
-                                              style: TextStyle(
-                                                fontSize: 20.0,
-                                                color: Color(0xFF211551),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 8.0, top: 8.0),
-                                      child: Text(
-                                        'Description',
-                                        style: TextStyle(
-                                            fontSize: 15.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Container(
-                                        margin:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 5),
-                                        width: size.width * 0.9,
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(29),
-                                            border: Border.all(
-                                                color: Colors.blueAccent)),
-                                        child: TextFormField(
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                          maxLines: 30,
-                                          focusNode: _descriptionFocus,
-                                          // onChanged: (value) async {},
-                                          controller: _descriptionController,
-                                          decoration: InputDecoration(
-                                            hintText: "Enter Description...",
-                                            border: InputBorder.none,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          width: size.width * 0.9,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.circular(kContainerBorderRadius),
+                              border: Border.all(color: kPrimaryColor)),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _titleController,
+                                  focusNode: _titleFocus,
+                                  onFieldSubmitted: (value) =>
+                                      _descriptionFocus.requestFocus(),
+                                  validator: (value) => value.isEmpty
+                                      ? AppLocalizations.of(context).translate(
+                                          "todosCreateEditTaskNameValidatorMsg")
+                                      : null,
+                                  decoration: InputDecoration(
+                                    hintText: "Enter Title",
+                                    border: InputBorder.none,
+                                  ),
+                                  style: TextStyle(
+                                    color: Color(0xFF211551),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                          child: Text(
+                            'Description',
+                            style: TextStyle(
+                                fontSize: 15.0, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          width: size.width * 0.9,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.circular(kContainerBorderRadius),
+                              border: Border.all(color: kGradientColorOne)),
+                          child: TextFormField(
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            maxLines: 15,
+                            focusNode: _descriptionFocus,
+                            // onChanged: (value) async {},
+                            controller: _descriptionController,
+                            decoration: InputDecoration(
+                              hintText: "Enter Description...",
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

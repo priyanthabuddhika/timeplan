@@ -19,7 +19,7 @@ import 'package:timeplan/screens/reminderpage.dart';
 import 'package:timeplan/screens/scheduleaddpage.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:timeplan/services/firestore_database.dart';
-import 'package:timeplan/shared/constants.dart';
+import 'package:timeplan/shared/app_themes.dart';
 
 // class MyApp extends StatelessWidget {
 //   const MyApp({Key key, this.databaseBuilder}) : super(key: key);
@@ -109,11 +109,12 @@ class MyApp extends StatelessWidget {
                     return supportedLocales.first;
                   },
                   title: 'Timeplan',
-                  theme: ThemeData(
-                      primaryColor: Color(0xFF7113D0),
-                      primaryColorLight: kPrimaryColor,
-                      accentColor: kPrimaryColor,
-                      timePickerTheme: TimePickerThemeData()),
+                  theme: AppThemes.lightTheme,
+                  // theme: ThemeData(
+                  //     primaryColor: Color(0xFF7113D0),
+                  //     primaryColorLight: kPrimaryColor,
+                  //     accentColor: kPrimaryColor,
+                  //     timePickerTheme: TimePickerThemeData()),
                   // routes: Routes.routes,
                   onGenerateRoute: (settings) {
                     switch (settings.name) {
@@ -149,7 +150,7 @@ class MyApp extends StatelessWidget {
                       case '/schedulespage':
                         return PageTransition(
                           child: SchedulePage(),
-                          type: PageTransitionType.bottomToTop,
+                          type: PageTransitionType.scale,
                           settings: settings,
                           duration: Duration(milliseconds: 400),
                           reverseDuration: Duration(milliseconds: 300),
@@ -158,7 +159,7 @@ class MyApp extends StatelessWidget {
                       case '/reminderspage':
                         return PageTransition(
                           child: ReminderPage(),
-                          type: PageTransitionType.bottomToTop,
+                          type: PageTransitionType.scale,
                           settings: settings,
                           duration: Duration(milliseconds: 400),
                           reverseDuration: Duration(milliseconds: 300),
@@ -195,6 +196,7 @@ class MyApp extends StatelessWidget {
                         return null;
                     }
                   },
+
                   home: Consumer<AuthProvider>(
                     builder: (_, authProviderRef, __) {
                       if (userSnapshot.connectionState ==

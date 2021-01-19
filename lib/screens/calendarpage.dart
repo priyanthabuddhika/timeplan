@@ -132,7 +132,6 @@ class _CalendarViewState extends State<CalendarView>
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     _buildTableCalendar(),
-                    kSizedBox,
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: ListTile(
@@ -161,7 +160,7 @@ class _CalendarViewState extends State<CalendarView>
                         ),
                       ),
                     ),
-                    kSizedBox,
+                  
                     Expanded(child: _buildRemiderList(schedule)),
                   ],
                 );
@@ -183,7 +182,7 @@ class _CalendarViewState extends State<CalendarView>
   // Simple TableCalendar configuration (using Styles)
   Widget _buildTableCalendar() {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
       decoration: BoxDecoration(
           color: Colors.white, borderRadius: BorderRadius.circular(15.0)),
       padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
@@ -196,7 +195,7 @@ class _CalendarViewState extends State<CalendarView>
         startingDayOfWeek: StartingDayOfWeek.monday,
         calendarStyle: CalendarStyle(
           contentPadding:
-              EdgeInsets.only(left: 8.0, bottom: 4.0, top: 4.0, right: 8.0),
+              EdgeInsets.only(left: 5.0, bottom: 0, top: 0, right: 5.0),
           selectedColor: kGradientColorTwo,
           todayColor: Colors.deepOrange[200],
           outsideDaysVisible: true,

@@ -1,10 +1,18 @@
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
-import 'package:timeplan/models/remindertype.dart';
+import 'package:timeplan/main.dart';
 import 'package:timeplan/models/remider.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/services/app_localizations.dart';
+import 'package:timeplan/shared/timezone.dart';
+import 'package:timeplan/shared/typeWidget.dart';
+
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/standalone.dart' as tz;
 
 class ReminderPage extends StatefulWidget {
   static const String id = "reminderspage";
@@ -36,7 +44,7 @@ class _ReminderPageState extends State<ReminderPage> {
     final DateTime picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
-        firstDate: DateTime(2015, 8),
+        firstDate: selectedDate,
         lastDate: DateTime(2101));
     if (picked != null && picked != selectedDate)
       setState(() {
@@ -52,12 +60,12 @@ class _ReminderPageState extends State<ReminderPage> {
       initialTime: selectedTime,
     );
     if (picked != null && picked != selectedTime) {
-      dateTimeTemp = selectedDate.add(
-        Duration(hours: picked.hour, minutes: picked.minute),
-      );
+      dateTimeTemp = DateTime(selectedDate.year, selectedDate.month,
+          selectedDate.day, picked.hour, picked.minute);
 
       setState(() {
         selectedDate = dateTimeTemp;
+        selectedTime = picked;
         print(selectedDate.toString());
       });
     }
@@ -97,6 +105,7 @@ class _ReminderPageState extends State<ReminderPage> {
     if (_reminderModel != null) {
       _reminder = _reminderModel;
       _reminderType = _reminderModel.type;
+      selectedDate = _reminderModel.date;
     }
     if (!_initCompleted) {
       _titleController =
@@ -124,7 +133,7 @@ class _ReminderPageState extends State<ReminderPage> {
         type: _reminderType != "" ? _reminderType : "Other",
         date: selectedDate,
       ));
-
+      scheduleAlarm(selectedDate, _titleController.text);
       Navigator.of(context).pop();
     }
   }
@@ -135,37 +144,24 @@ class _ReminderPageState extends State<ReminderPage> {
 
     Future<bool> _onWillPop() {
       if (_titleController.text != "") {
-        return showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text(
-                  'Are you sure you want to leave?',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                content: Text('Your reminder will not be saved'),
-                actions: <Widget>[
-                  FlatButton(
-                    onPressed: () {
-                      // saveToFirestore();
-                      Navigator.of(context).pop(false);
-                    },
-                    child: Text(
-                      'Save & exit',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ),
-                  FlatButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    /*Navigator.of(context).pop(true)*/
-                    child: Text(
-                      'Yes',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ],
-              ),
-            ) ??
-            false;
+        return CoolAlert.show(
+          context: context,
+          type: CoolAlertType.confirm,
+          text: "Your reminder will not be saved",
+          cancelBtnText: "Save",
+          onCancelBtnTap: () {
+            saveToFirestore();
+            Navigator.of(context).pop(true);
+          },
+          confirmBtnColor: Colors.red,
+          confirmBtnText: "Yes",
+          cancelBtnTextStyle:
+              TextStyle(color: kGradientColorOne, fontWeight: FontWeight.bold),
+          onConfirmBtnTap: () {
+            Navigator.of(context).pop(true);
+            Navigator.of(context).pop(true);
+          },
+        );
       } else {
         return Future.delayed(Duration(milliseconds: 1), () {
           return true;
@@ -194,17 +190,19 @@ class _ReminderPageState extends State<ReminderPage> {
             backgroundColor: Color(0xFFF6F6F6),
             title: Text(
               _reminder != null ? kEditReminder : kAddReminder,
-              style: TextStyle(color: Colors.black),
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
             ),
             centerTitle: true,
             actions: [
               GestureDetector(
                 child: Center(
                     child: Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
+                  padding: const EdgeInsets.only(right: 20.0),
                   child: Text(
                     'Save',
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(
+                        color: kGradientColorTwo, fontWeight: FontWeight.bold),
                   ),
                 )),
                 onTap: () {
@@ -215,51 +213,56 @@ class _ReminderPageState extends State<ReminderPage> {
           ),
           body: SingleChildScrollView(
             child: SafeArea(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 24.0),
-                color: Color(0xFFF6F6F6),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(
-                        bottom: 20.0,
-                        top: 20.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.circular(10), //Color(0xFFF6F6F6),
-                      ),
-                      child: ExpansionTile(
-                        title: Text(
-                          "Reminder Type",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          "$_reminderType",
-                        ),
-                        trailing:
-                            IconButton(icon: Icon(Icons.add), onPressed: null),
-                        children: [
-                          Container(
-                            child: ReminderTypeWidget(
-                              previousType: _reminderType,
-                              onValueChanged: (value) async {
-                                if (value != "") {
-                                  setState(() {
-                                    print(value);
-                                    _reminderType = value;
-                                  });
-                                }
-                              },
-                            ),
-                          ),
-                          kSizedBox,
-                        ],
-                      ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(
+                      bottom: 20.0,
+                      left: 20.0,
+                      right: 20.0,
+                      top: 20.0,
                     ),
-                    Row(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(
+                          kBoxDecorationRadius), //Color(0xFFF6F6F6),
+                    ),
+                    child: ExpansionTile(
+                      title: Text(
+                        "Reminder Type",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        "$_reminderType",
+                      ),
+                      trailing:
+                          IconButton(icon: Icon(Icons.add), onPressed: null),
+                      children: [
+                        Container(
+                          child: ReminderTypeWidget(
+                            isReminder: true,
+                            previousType: _reminderType,
+                            onValueChanged: (value) async {
+                              if (value != "") {
+                                setState(() {
+                                  print(value);
+                                  _reminderType = value;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        kSizedBox,
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: 20.0,
+                      right: 20.0,
+                    ),
+                    child: Row(
                       children: <Widget>[
                         Expanded(
                           child: InkWell(
@@ -271,7 +274,7 @@ class _ReminderPageState extends State<ReminderPage> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(
-                                    10), //Color(0xFFF6F6F6),
+                                    kBoxDecorationRadius), //Color(0xFFF6F6F6),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,7 +283,7 @@ class _ReminderPageState extends State<ReminderPage> {
                                     padding: const EdgeInsets.only(
                                         left: 8.0, top: 8.0),
                                     child: Text(
-                                      'Add a due date',
+                                      'Due date',
                                       style: TextStyle(fontSize: 15.0),
                                     ),
                                   ),
@@ -312,7 +315,7 @@ class _ReminderPageState extends State<ReminderPage> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(
-                                    10), //Color(0xFFF6F6F6),
+                                    kBoxDecorationRadius), //Color(0xFFF6F6F6),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -321,7 +324,7 @@ class _ReminderPageState extends State<ReminderPage> {
                                     padding: const EdgeInsets.only(
                                         left: 8.0, top: 8.0),
                                     child: Text(
-                                      'Select Time',
+                                      'Time',
                                       style: TextStyle(fontSize: 15.0),
                                     ),
                                   ),
@@ -342,99 +345,102 @@ class _ReminderPageState extends State<ReminderPage> {
                         ),
                       ],
                     ),
-                    Container(
-                      padding: EdgeInsets.all(8.0),
-                      margin: EdgeInsets.only(
-                        bottom: 20.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.circular(10), //Color(0xFFF6F6F6),
-                      ),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0, top: 8.0),
-                              child: Text(
-                                'Title',
-                                style: TextStyle(fontSize: 15.0),
-                              ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(8.0),
+                    margin: EdgeInsets.only(
+                      bottom: 20.0,
+                      left: 20.0,
+                      right: 20.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(
+                          kBoxDecorationRadius), //Color(0xFFF6F6F6),
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                            child: Text(
+                              'Title',
+                              style: TextStyle(
+                                  fontSize: 15.0, fontWeight: FontWeight.bold),
                             ),
-                            Container(
-                              margin: EdgeInsets.symmetric(vertical: 10),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 5),
-                              width: size.width * 0.9,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(29),
-                                  border: Border.all(color: Colors.blueAccent)),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: _titleController,
-                                      focusNode: _titleFocus,
-                                      onFieldSubmitted: (value) =>
-                                          _descriptionFocus.requestFocus(),
-                                      validator: (value) => value.isEmpty
-                                          ? AppLocalizations.of(context).translate(
-                                              "todosCreateEditTaskNameValidatorMsg")
-                                          : null,
-                                      decoration: InputDecoration(
-                                        hintText: "Enter Reminder Title",
-                                        border: InputBorder.none,
-                                      ),
-                                      style: TextStyle(
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF211551),
-                                      ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: 10),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 5),
+                            width: size.width * 0.9,
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.circular(kBoxDecorationRadius),
+                                border: Border.all(color: Colors.blueAccent)),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _titleController,
+                                    focusNode: _titleFocus,
+                                    onFieldSubmitted: (value) =>
+                                        _descriptionFocus.requestFocus(),
+                                    validator: (value) => value.isEmpty
+                                        ? AppLocalizations.of(context).translate(
+                                            "todosCreateEditTaskNameValidatorMsg")
+                                        : null,
+                                    decoration: InputDecoration(
+                                      hintText: "Enter Reminder Title",
+                                      border: InputBorder.none,
                                     ),
-                                  )
-                                ],
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF211551),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                            child: Text(
+                              'Description',
+                              style: TextStyle(
+                                  fontSize: 15.0, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: 10),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 5),
+                            width: size.width * 0.9,
+                            height: 100,
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.circular(kBoxDecorationRadius),
+                                border: Border.all(color: Colors.blueAccent)),
+                            child: TextFormField(
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              maxLines: 15,
+                              focusNode: _descriptionFocus,
+                              // onChanged: (value) async {},
+                              controller: _descriptionController,
+                              decoration: InputDecoration(
+                                hintText:
+                                    "Enter Description for the reminder...",
+                                border: InputBorder.none,
                               ),
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0, top: 8.0),
-                              child: Text(
-                                'Description',
-                                style: TextStyle(fontSize: 15.0),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.symmetric(vertical: 10),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 5),
-                              width: size.width * 0.9,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(29),
-                                  border: Border.all(color: Colors.blueAccent)),
-                              child: TextFormField(
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                                maxLines: 15,
-                                focusNode: _descriptionFocus,
-                                // onChanged: (value) async {},
-                                controller: _descriptionController,
-                                decoration: InputDecoration(
-                                  hintText:
-                                      "Enter Description for the reminder...",
-                                  border: InputBorder.none,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -451,7 +457,6 @@ class _ReminderPageState extends State<ReminderPage> {
 
                 _scaffoldKey.currentState.showSnackBar(
                   SnackBar(
-                    backgroundColor: Theme.of(context).appBarTheme.color,
                     content: Text(
                       AppLocalizations.of(context)
                               .translate("todosSnackBarContent") +
@@ -483,82 +488,34 @@ class _ReminderPageState extends State<ReminderPage> {
       ),
     );
   }
-}
 
-class ReminderTypeWidget extends StatefulWidget {
-  final ValueChanged<String> onValueChanged;
-  final String previousType;
+  void scheduleAlarm(
+      DateTime scheduledNotificationDateTime, String reminderInfo) async {
+    final timeZone = new TimeZone();
 
-  ReminderTypeWidget({this.onValueChanged, this.previousType});
+    // The device's timezone.
+    String timeZoneName = await timeZone.getTimeZoneName();
 
-  @override
-  _ReminderTypeWidgetState createState() => _ReminderTypeWidgetState();
-}
+    // Find the 'current location'
+    final location = await timeZone.getLocation(timeZoneName);
 
-class _ReminderTypeWidgetState extends State<ReminderTypeWidget> {
-  String reminderType;
-  int _selectedIndex;
-  List<ReminderTypeModel> _options = [
-    ReminderTypeModel(title: 'Birthday', icon: Icons.cake),
-    ReminderTypeModel(title: 'Lecture', icon: Icons.book),
-    ReminderTypeModel(title: 'Event', icon: Icons.event),
-    ReminderTypeModel(title: 'Assigment', icon: Icons.assignment),
-    ReminderTypeModel(title: 'Shopping', icon: Icons.shopping_basket),
-    ReminderTypeModel(title: 'Meeting', icon: Icons.people),
-    ReminderTypeModel(title: 'Other', icon: Icons.devices_other)
-  ];
+    final scheduledDate = tz.TZDateTime.from(selectedDate, location);
 
-  Widget _buildChips() {
-    List<Widget> chips = new List();
-
-    for (int i = 0; i < _options.length; i++) {
-      if ((widget.previousType != "" || _selectedIndex != null) &&
-          _options[i].title == widget.previousType) {
-        _selectedIndex = i;
-      }
-      ChoiceChip choiceChip = ChoiceChip(
-        selected: _selectedIndex == i,
-
-        label: Text(
-          _options[i].title,
-          style: TextStyle(
-              color: _selectedIndex == i ? Colors.white : Colors.black),
-        ),
-        avatar: Padding(
-          padding: const EdgeInsets.only(left: 5.0),
-          child: Icon(
-            _options[i].icon,
-            color: _selectedIndex == i ? Colors.white : Colors.purple,
-          ),
-        ),
-        // elevation: 10,
-        pressElevation: 5,
-        // shadowColor: Colors.teal,
-        backgroundColor: Colors.transparent,
-        shape: StadiumBorder(side: BorderSide(color: Colors.purple)),
-        selectedColor: Colors.purple[400],
-        onSelected: (bool selected) {
-          setState(() {
-            if (selected) {
-              _selectedIndex = i;
-            }
-            widget.onValueChanged(_options[i].title);
-          });
-        },
-      );
-
-      chips.add(Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10), child: choiceChip));
-    }
-
-    return Wrap(
-      // This next line does the trick.
-      children: chips,
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'alarm_notif',
+      'alarm_notif',
+      'Channel for Alarm notification',
+      icon: 'ic_local_icon',
     );
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return _buildChips();
+    var platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+        0, 'Office', reminderInfo, scheduledDate, platformChannelSpecifics,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        androidAllowWhileIdle: true);
   }
 }

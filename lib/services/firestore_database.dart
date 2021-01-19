@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:timeplan/models/note.dart';
 import 'package:timeplan/models/remider.dart';
+import 'package:timeplan/models/remindertype.dart';
 import 'package:timeplan/models/schedule.dart';
 import 'package:timeplan/services/firestore_path.dart';
 import 'package:timeplan/services/firestore_service.dart';
@@ -37,6 +38,12 @@ class FirestoreDatabase {
         data: note.toMap(),
       );
 
+  //Method to create/update reminderType
+  Future<void> setType(ReminderTypeModel type) async =>
+      await _firestoreService.setData(
+        path: FirestorePath.reminderType(uid, documentIdFromCurrentDate()),
+        data: type.toMap(),
+      );
   //Method to delete reminderModel entry
   Future<void> deleteReminder(Reminder reminder) async {
     await _firestoreService.deleteData(
@@ -92,6 +99,14 @@ class FirestoreDatabase {
   Stream<List<Note>> notesStream() => _firestoreService.collectionStream(
         path: FirestorePath.notes(uid),
         builder: (data, documentId) => Note.fromMap(data, documentId),
+      );
+
+  //Method to retrieve all types item from the same user based on uid
+  Stream<List<ReminderTypeModel>> typesStream() =>
+      _firestoreService.collectionStream(
+        path: FirestorePath.reminderTypes(uid),
+        builder: (data, documentId) =>
+            ReminderTypeModel.fromMap(data, documentId),
       );
 
   // Method to retrieve schedule list for day

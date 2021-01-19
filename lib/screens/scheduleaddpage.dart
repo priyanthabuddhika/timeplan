@@ -1,3 +1,4 @@
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/remindertype.dart';
@@ -5,6 +6,7 @@ import 'package:timeplan/models/schedule.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/services/app_localizations.dart';
+import 'package:timeplan/shared/typeWidget.dart';
 
 class SchedulePage extends StatefulWidget {
   static const String id = "schedulespage";
@@ -42,9 +44,8 @@ class _SchedulePageState extends State<SchedulePage> {
       initialTime: TimeOfDay.fromDateTime(startTime),
     );
     if (picked != null && picked != TimeOfDay.fromDateTime(startTime)) {
-      dateTimeTemp = startTime.add(
-        Duration(hours: picked.hour, minutes: picked.minute),
-      );
+      dateTimeTemp = DateTime(startTime.year, startTime.month, startTime.day,
+          picked.hour, picked.minute);
 
       setState(() {
         startTime = dateTimeTemp;
@@ -59,11 +60,17 @@ class _SchedulePageState extends State<SchedulePage> {
       context: context,
       initialTime: TimeOfDay.fromDateTime(endTime),
     );
-
-    if (picked != null && picked != TimeOfDay.fromDateTime(endTime)) {
-      dateTimeTemp = startTime.add(
-        Duration(hours: picked.hour, minutes: picked.minute),
-      );
+    if (picked != null && picked.hour < startTime.hour) {
+      CoolAlert.show(
+          context: context,
+          type: CoolAlertType.error,
+          title: "Error",
+          borderRadius: 15.0,
+          confirmBtnColor: kGradientColorOne,
+          text: "End time is lower than start time!");
+    } else if (picked != null && picked != TimeOfDay.fromDateTime(endTime)) {
+      dateTimeTemp = DateTime(
+          endTime.year, endTime.month, endTime.day, picked.hour, picked.minute);
 
       setState(() {
         endTime = dateTimeTemp;
@@ -116,6 +123,8 @@ class _SchedulePageState extends State<SchedulePage> {
       _schedule = _scheduleModel;
       _scheduleType = _scheduleModel.type;
       _weekDay = _scheduleModel.date;
+      startTime = _scheduleModel.startTime;
+      endTime = _scheduleModel.endTime;
     }
     if (!_initCompleted) {
       _titleController =
@@ -156,36 +165,24 @@ class _SchedulePageState extends State<SchedulePage> {
 
     Future<bool> _onWillPop() {
       if (_titleController.text != "") {
-        return showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text(
-                  'Are you sure you want to leave?',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                content: Text('Your schedule update will not be saved'),
-                actions: <Widget>[
-                  FlatButton(
-                    onPressed: () {
-                      saveToFirestore();
-                      Navigator.of(context).pop(false);
-                    },
-                    child: Text(
-                      'Save & exit',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ),
-                  FlatButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    child: Text(
-                      'Yes',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ],
-              ),
-            ) ??
-            false;
+        return CoolAlert.show(
+          context: context,
+          type: CoolAlertType.confirm,
+          text: "Your schedule will not be saved",
+          cancelBtnText: "Save",
+          onCancelBtnTap: () {
+            saveToFirestore();
+            Navigator.of(context).pop(true);
+          },
+          confirmBtnColor: Colors.red,
+          confirmBtnText: "Yes",
+          cancelBtnTextStyle:
+              TextStyle(color: kGradientColorOne, fontWeight: FontWeight.bold),
+          onConfirmBtnTap: () {
+            Navigator.of(context).pop(true);
+            Navigator.of(context).pop(true);
+          },
+        );
       } else {
         return Future.delayed(Duration(milliseconds: 1), () {
           return true;
@@ -222,10 +219,11 @@ class _SchedulePageState extends State<SchedulePage> {
               GestureDetector(
                 child: Center(
                     child: Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
+                  padding: const EdgeInsets.only(right: 20.0),
                   child: Text(
                     'Save',
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(
+                        color: kGradientColorTwo, fontWeight: FontWeight.bold),
                   ),
                 )),
                 onTap: () {
@@ -262,7 +260,8 @@ class _SchedulePageState extends State<SchedulePage> {
                             IconButton(icon: Icon(Icons.add), onPressed: null),
                         children: [
                           Container(
-                            child: ScheduleTypeWidget(
+                            child: ReminderTypeWidget(
+                              isReminder: false,
                               previousType: _scheduleType,
                               onValueChanged: (value) async {
                                 if (value != "") {
@@ -280,7 +279,8 @@ class _SchedulePageState extends State<SchedulePage> {
                     ),
                     Container(
                       width: size.width * 0.9,
-                      padding: EdgeInsets.all(8.0),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 20.0),
                       margin: EdgeInsets.only(
                         bottom: 20.0,
                       ),
@@ -289,16 +289,29 @@ class _SchedulePageState extends State<SchedulePage> {
                         borderRadius:
                             BorderRadius.circular(10), //Color(0xFFF6F6F6),
                       ),
-                      child: WeekDayTypeWidget(
-                        previousType: _weekDay,
-                        onValueChanged: (value) async {
-                          if (value != "") {
-                            setState(() {
-                              print(value);
-                              _weekDay = value;
-                            });
-                          }
-                        },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              "Week Day",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          kSizedBox,
+                          WeekDayTypeWidget(
+                            previousType: _weekDay,
+                            onValueChanged: (value) async {
+                              if (value != "") {
+                                setState(() {
+                                  print(value);
+                                  _weekDay = value;
+                                });
+                              }
+                            },
+                          ),
+                        ],
                       ),
                     ),
                     Row(
@@ -435,7 +448,6 @@ class _SchedulePageState extends State<SchedulePage> {
                                         border: InputBorder.none,
                                       ),
                                       style: TextStyle(
-                                        fontSize: 20.0,
                                         color: Color(0xFF211551),
                                       ),
                                     ),
@@ -497,7 +509,6 @@ class _SchedulePageState extends State<SchedulePage> {
 
                 _scaffoldKey.currentState.showSnackBar(
                   SnackBar(
-                    backgroundColor: Theme.of(context).appBarTheme.color,
                     content: Text(
                       AppLocalizations.of(context)
                               .translate("todosSnackBarContent") +
@@ -528,81 +539,6 @@ class _SchedulePageState extends State<SchedulePage> {
         ),
       ),
     );
-  }
-}
-
-class ScheduleTypeWidget extends StatefulWidget {
-  final ValueChanged<String> onValueChanged;
-  final String previousType;
-
-  ScheduleTypeWidget({this.onValueChanged, this.previousType});
-
-  @override
-  _ScheduleTypeWidgetState createState() => _ScheduleTypeWidgetState();
-}
-
-class _ScheduleTypeWidgetState extends State<ScheduleTypeWidget> {
-  String scheduleType;
-  int _selectedIndex;
-  List<ReminderTypeModel> _options = [
-    ReminderTypeModel(title: 'Lecture', icon: Icons.book),
-    ReminderTypeModel(title: 'Event', icon: Icons.event),
-    ReminderTypeModel(title: 'Meeting', icon: Icons.people),
-    ReminderTypeModel(title: 'Other', icon: Icons.devices_other)
-  ];
-
-  Widget _buildChips() {
-    List<Widget> chips = new List();
-
-    for (int i = 0; i < _options.length; i++) {
-      if ((widget.previousType != "" || _selectedIndex != null) &&
-          _options[i].title == widget.previousType) {
-        _selectedIndex = i;
-      }
-      ChoiceChip choiceChip = ChoiceChip(
-        selected: _selectedIndex == i,
-
-        label: Text(
-          _options[i].title,
-          style: TextStyle(
-              color: _selectedIndex == i ? Colors.white : Colors.black),
-        ),
-        avatar: Padding(
-          padding: const EdgeInsets.only(left: 5.0),
-          child: Icon(
-            _options[i].icon,
-            color: _selectedIndex == i ? Colors.white : Colors.purple,
-          ),
-        ),
-        // elevation: 10,
-        pressElevation: 5,
-        // shadowColor: Colors.teal,
-        backgroundColor: Colors.transparent,
-        shape: StadiumBorder(side: BorderSide(color: Colors.purple)),
-        selectedColor: Colors.purple[400],
-        onSelected: (bool selected) {
-          setState(() {
-            if (selected) {
-              _selectedIndex = i;
-            }
-            widget.onValueChanged(_options[i].title);
-          });
-        },
-      );
-
-      chips.add(Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10), child: choiceChip));
-    }
-
-    return Wrap(
-      // This next line does the trick.
-      children: chips,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildChips();
   }
 }
 
@@ -650,9 +586,9 @@ class _WeekDayTypeWidgetState extends State<WeekDayTypeWidget> {
         pressElevation: 5,
         // shadowColor: Colors.teal,
         backgroundColor: Colors.transparent,
-        shape: CircleBorder(side: BorderSide(color: Colors.blue)),
+        shape: CircleBorder(side: BorderSide(color: kGradientColorOne)),
         // shape: StadiumBorder(side: BorderSide(color: Colors.purple)),
-        selectedColor: Colors.blue,
+        selectedColor: kPrimaryColor,
         onSelected: (bool selected) {
           setState(() {
             if (selected) {

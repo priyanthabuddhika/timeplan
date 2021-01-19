@@ -26,3 +26,5 @@ const kContainerBorderRadius = 15.0;
 const kButtonBorderRadius = 29.0;
 
 const kSizedBox = SizedBox(height: 10.0);
+
+const kBoxDecorationRadius = 15.0; 
