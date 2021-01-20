@@ -49,7 +49,7 @@ class _SchedulePageState extends State<SchedulePage> {
 
       setState(() {
         startTime = dateTimeTemp;
-        print(startTime.toString());
+        
       });
     }
   }
@@ -74,7 +74,7 @@ class _SchedulePageState extends State<SchedulePage> {
 
       setState(() {
         endTime = dateTimeTemp;
-        print(startTime.toString());
+        
       });
     }
   }
@@ -136,7 +136,7 @@ class _SchedulePageState extends State<SchedulePage> {
   }
 
   void saveToFirestore() {
-    print(_scheduleType);
+    
     if (_formKey.currentState.validate()) {
       FocusScope.of(context).unfocus();
 
@@ -312,7 +312,7 @@ class _SchedulePageState extends State<SchedulePage> {
                             onValueChanged: (value) async {
                               if (value != "") {
                                 setState(() {
-                                  print(value);
+                                  
                                   _weekDay = value;
                                 });
                               }
@@ -508,7 +508,7 @@ class _SchedulePageState extends State<SchedulePage> {
             onPressed: () async {
               Schedule _scheduleToDelete =
                   ModalRoute.of(context).settings.arguments;
-              print("delete:" + _scheduleToDelete.id);
+              
               if (_scheduleToDelete != null) {
                 final firestoreDatabase =
                     Provider.of<FirestoreDatabase>(context, listen: false);

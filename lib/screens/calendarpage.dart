@@ -66,7 +66,7 @@ class _CalendarViewState extends State<CalendarView>
   }
 
   void _onDaySelected(DateTime day, List events, List holidays) {
-    print('CALLBACK: _onDaySelected');
+    
     setState(() {
       _selectedDate = day;
     });
@@ -85,7 +85,7 @@ class _CalendarViewState extends State<CalendarView>
 
   void _onCalendarCreated(
       DateTime first, DateTime last, CalendarFormat format) {
-    print('CALLBACK: _onCalendarCreated');
+    
   }
 
   @override
@@ -211,7 +211,7 @@ class _CalendarViewState extends State<CalendarView>
                 );
               }
             } else if (snapshot.hasError) {
-              print("jjdfjf" + snapshot.error.toString());
+              
               return EmptyContentWidget(
                 assetSrc: "assets/icons/Add_files.svg",
                 title: AppLocalizations.of(context)

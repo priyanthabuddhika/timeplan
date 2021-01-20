@@ -127,7 +127,7 @@ class _NoteViewWidgetState extends State<NoteViewWidget> {
             );
           }
         } else if (snapshot.hasError) {
-          print("jjdfjf" + snapshot.error.toString());
+          
           return EmptyContentWidget(
             title:
                 AppLocalizations.of(context).translate("todosErrorTopMsgTxt"),

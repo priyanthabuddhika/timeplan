@@ -69,7 +69,7 @@ class _ReminderTypeWidgetState extends State<ReminderTypeWidget> {
             );
 
             if (icon != null) {
-              print("III" + icon.codePoint.toString());
+              
               setState(() {
                 iconData = Icon(icon);
               });
@@ -276,7 +276,7 @@ class _ReminderTypeWidgetState extends State<ReminderTypeWidget> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List<ReminderTypeModel> types = snapshot.data;
-            print(types.length.toString());
+            
             if (types.isNotEmpty) {
               return _buildChips(types);
             } else {

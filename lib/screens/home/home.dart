@@ -273,7 +273,7 @@ class Home extends StatelessWidget {
             );
           }
         } else if (snapshot.hasError) {
-          print("jjdfjf" + snapshot.error.toString());
+          
           return EmptyContentWidget(
             assetSrc: "assets/icons/Add_files.svg",
             title:

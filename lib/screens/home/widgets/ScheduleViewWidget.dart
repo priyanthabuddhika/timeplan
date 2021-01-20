@@ -76,7 +76,7 @@ class _ScheduleViewWidgetState extends State<ScheduleViewWidget> {
   Widget _buildRemindersList() {
     DateTime day = DateTime.now();
     String weekDay = DateFormat('EEEE').format(day);
-    print(weekDay);
+    
     final _firestoreDatabase =
         Provider.of<FirestoreDatabase>(widget.context, listen: false);
     return StreamBuilder(
@@ -161,7 +161,7 @@ class _ScheduleViewWidgetState extends State<ScheduleViewWidget> {
             );
           }
         } else if (snapshot.hasError) {
-          print("jjdfjf" + snapshot.error.toString());
+          
           return EmptyContentWidget(
             assetSrc: "assets/icons/Add_files.svg",
             title:

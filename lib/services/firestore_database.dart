@@ -122,7 +122,7 @@ class FirestoreDatabase {
 
   // Method to retrieve reminders list for day
   Stream<List<Reminder>> remindersForDay({DateTime day, DateTime datePlus}) {
-    print(day.toString());
+    
     String date = day.toString().split(' ')[0];
     String dayPlus = datePlus.toString().split(' ')[0];
 

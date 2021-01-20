@@ -45,7 +45,7 @@ class _RemindersViewWidgetState extends State<RemindersViewWidget> {
       date = date.add(Duration(days: 1));
     }
     date = date.subtract(Duration(days: 7));
-    print("jdjjf" + date.toString());
+    
   }
 
   @override
@@ -222,7 +222,7 @@ class _RemindersViewWidgetState extends State<RemindersViewWidget> {
             );
           }
         } else if (snapshot.hasError) {
-          print("jjdfjf" + snapshot.error.toString());
+          
           return EmptyContentWidget(
             title:
                 AppLocalizations.of(context).translate("todosErrorTopMsgTxt"),

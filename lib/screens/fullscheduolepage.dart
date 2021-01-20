@@ -305,7 +305,7 @@ class _FullSchedulePageState extends State<FullSchedulePage>
               );
             }
           } else if (snapshot.hasError) {
-            print("jjdfjf" + snapshot.error.toString());
+            
             return EmptyContentWidget(
               title:
                   AppLocalizations.of(context).translate("todosErrorTopMsgTxt"),

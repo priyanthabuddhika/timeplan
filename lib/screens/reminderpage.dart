@@ -45,7 +45,7 @@ class _ReminderPageState extends State<ReminderPage> {
         lastDate: DateTime(2101));
     if (picked != null && picked != selectedDate)
       setState(() {
-        // print(picked.toString());
+        // 
         selectedDate = picked;
       });
   }
@@ -63,7 +63,7 @@ class _ReminderPageState extends State<ReminderPage> {
       setState(() {
         selectedDate = dateTimeTemp;
         selectedTime = picked;
-        print(selectedDate.toString());
+        
       });
     }
   }
@@ -75,7 +75,7 @@ class _ReminderPageState extends State<ReminderPage> {
     _descriptionFocus = FocusNode();
 
     selectedDate = DateTime.now();
-    print(selectedDate.toLocal().toString());
+    
     selectedTime = TimeOfDay.now();
 
     _reminderType = "";
@@ -115,7 +115,7 @@ class _ReminderPageState extends State<ReminderPage> {
   }
 
   void saveToFirestore() {
-    print(_reminderType);
+    
     if (_formKey.currentState.validate()) {
       FocusScope.of(context).unfocus();
 
@@ -245,7 +245,7 @@ class _ReminderPageState extends State<ReminderPage> {
                             onValueChanged: (value) async {
                               if (value != "") {
                                 setState(() {
-                                  print(value);
+                                  
                                   _reminderType = value;
                                 });
                               }
@@ -253,7 +253,7 @@ class _ReminderPageState extends State<ReminderPage> {
                             onIconChanged: (value) async {
                               if (value != null) {
                                 setState(() {
-                                  print(value);
+                                  
                                   iconData = value;
                                 });
                               }
@@ -456,7 +456,7 @@ class _ReminderPageState extends State<ReminderPage> {
             onPressed: () async {
               Reminder _reminderToDelete =
                   ModalRoute.of(context).settings.arguments;
-              print("delete:" + _reminderToDelete.id);
+              
               if (_reminderToDelete != null) {
                 final firestoreDatabase =
                     Provider.of<FirestoreDatabase>(context, listen: false);
