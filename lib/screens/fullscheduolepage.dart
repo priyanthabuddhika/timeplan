@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/schedule.dart';
-import 'package:timeplan/screens/home/empty_content.dart';
+import 'package:timeplan/screens/home/widgets/empty_content.dart';
 import 'package:timeplan/screens/home/widgets/dateTile.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeline_tile/timeline_tile.dart';
-import 'package:timeplan/shared/typeIcon.dart';
 
 class FullSchedulePage extends StatefulWidget {
   @override
@@ -180,6 +179,8 @@ class _FullSchedulePageState extends State<FullSchedulePage>
   }
 
   Widget _buildRemiderList() {
+    Size size = MediaQuery.of(context).size;
+
     return StreamBuilder(
         stream: _firestoreDatabase.schedulesForDay(day: selectedDate),
         builder: (context, snapshot) {
@@ -262,8 +263,7 @@ class _FullSchedulePageState extends State<FullSchedulePage>
                                         fontWeight: FontWeight.bold),
                                   ),
                                   trailing: Icon(
-                                    ReminderIcon.getReminderIcon(
-                                        schedule[index].type),
+                                    schedule[index].icon,
                                     color: kGradientColorOne,
                                   ),
                                 ),
@@ -292,11 +292,16 @@ class _FullSchedulePageState extends State<FullSchedulePage>
                     itemCount: schedule.length),
               );
             } else {
-              return EmptyContentWidget(
-                title: AppLocalizations.of(context)
-                    .translate("todosEmptyTopMsgDefaultTxt"),
-                message: AppLocalizations.of(context)
-                    .translate("todosEmptyBottomDefaultMsgTxt"),
+              return SizedBox(
+                height: size.height * 0.2,
+                width: size.width * 0.7,
+                child: EmptyContentWidget(
+                  title: AppLocalizations.of(context)
+                      .translate("todosEmptyTopMsgDefaultTxt"),
+                  assetSrc: "assets/icons/Add_files.svg",
+                  message: AppLocalizations.of(context)
+                      .translate("todosEmptyBottomDefaultMsgTxt"),
+                ),
               );
             }
           } else if (snapshot.hasError) {

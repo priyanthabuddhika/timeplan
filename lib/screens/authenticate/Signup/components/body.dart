@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:timeplan/screens/authenticate/Signup/components/background.dart';
-import 'package:timeplan/screens/authenticate/Signup/components/or_divider.dart';
 import 'package:timeplan/screens/authenticate/Signup/components/social_icon.dart';
 import 'package:timeplan/components/already_have_an_account_acheck.dart';
 import 'package:timeplan/components/rounded_button.dart';
 import 'package:timeplan/services/auth.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/shared/loading.dart';
+import 'package:timeplan/shared/regex.dart';
 
 class Body extends StatefulWidget {
   final Function toggleView;
@@ -68,6 +68,18 @@ class _BodyState extends State<Body> {
                       ),
                       child: TextFormField(
                         onChanged: (value) {
+                          final emailMatch = emailRegex.stringMatch(value);
+
+                          if (emailMatch == null) {
+                            setState(() {
+                              error = "Please insert a valid email";
+                            });
+                          } else {
+                            setState(() {
+                              error = "";
+                            });
+                          }
+
                           setState(() => email = value);
                         },
                         validator: (value) =>
@@ -124,35 +136,29 @@ class _BodyState extends State<Body> {
                         ),
                       ),
                     ),
-                    RoundedButton(
-                      text: "Sign Up",
-                      press: () async {
-                        if (_formKey.currentState.validate()) {
-                          setState(() => loading = true);
-                          dynamic result = await _auth
-                              .registerWithEmailAndPassword(email, password);
-                          if (result == null) {
-                            setState(() {
-                              loading = false;
-                              error = 'Please supply a valid email';
-                            });
-                          }
-                        }
-                      },
-                    ),
-                    SizedBox(height: size.height * 0.01),
-                    Text(
-                      error,
-                      style: TextStyle(color: Colors.red, fontSize: 14.0),
-                    ),
-                    AlreadyHaveAnAccountCheck(
-                      login: false,
-                      press: () => widget.toggleView(),
-                    ),
-                    OrDivider(),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(width: size.width * 0.1),
+                        Expanded(
+                          child: RoundedButton(
+                            text: "Sign up",
+                            press: () async {
+                              if (_formKey.currentState.validate()) {
+                                setState(() => loading = true);
+                                dynamic result =
+                                    await _auth.registerWithEmailAndPassword(
+                                        email, password);
+                                if (result == null) {
+                                  setState(() {
+                                    loading = false;
+                                    error = 'Please supply a valid email';
+                                  });
+                                }
+                              }
+                            },
+                          ),
+                        ),
                         SocalIcon(
                             iconSrc: "assets/icons/google-plus.svg",
                             press: () async {
@@ -165,8 +171,18 @@ class _BodyState extends State<Body> {
                                 });
                               }
                             }),
+                        SizedBox(width: size.width * 0.1),
                       ],
-                    )
+                    ),
+                    SizedBox(height: size.height * 0.03),
+                    Text(
+                      error,
+                      style: TextStyle(color: Colors.red, fontSize: 14.0),
+                    ),
+                    AlreadyHaveAnAccountCheck(
+                      login: false,
+                      press: () => widget.toggleView(),
+                    ),
                   ],
                 ),
               ),

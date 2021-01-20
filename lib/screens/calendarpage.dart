@@ -4,12 +4,11 @@ import 'package:provider/provider.dart';
 // import 'package:intl/date_symbol_data_local.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:timeplan/models/remider.dart';
-import 'package:timeplan/screens/home/empty_content.dart';
+import 'package:timeplan/screens/home/widgets/empty_content.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeline_tile/timeline_tile.dart';
-import 'package:timeplan/shared/typeIcon.dart';
 
 class CalendarView extends StatefulWidget {
   @override
@@ -91,6 +90,8 @@ class _CalendarViewState extends State<CalendarView>
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: kPrimaryBackgroundColor,
       appBar: AppBar(
@@ -160,18 +161,63 @@ class _CalendarViewState extends State<CalendarView>
                         ),
                       ),
                     ),
-                  
                     Expanded(child: _buildRemiderList(schedule)),
+                  ],
+                );
+              } else {
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    _buildTableCalendar(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: ListTile(
+                        title: Text(
+                          "Reminders",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20.0),
+                        ),
+                        subtitle: Text(
+                          "You have ${schedule.length} upcoming events",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        // style: TextStyle(color: Colors.grey, fontSize: 14)),
+                        trailing: InkWell(
+                          onTap: () {
+                            Navigator.of(context).pushNamed(
+                              '/reminderspage',
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.white),
+                            padding: EdgeInsets.all(8),
+                            child: Icon(Icons.add),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: size.height * 0.3,
+                      child: EmptyContentWidget(
+                        assetSrc: "assets/icons/Add_files.svg",
+                        title: AppLocalizations.of(context)
+                            .translate("todosEmptyTopMsgDefaultTxt"),
+                        message: AppLocalizations.of(context)
+                            .translate("todosEmptyBottomDefaultMsgTxt"),
+                      ),
+                    ),
                   ],
                 );
               }
             } else if (snapshot.hasError) {
               print("jjdfjf" + snapshot.error.toString());
               return EmptyContentWidget(
+                assetSrc: "assets/icons/Add_files.svg",
                 title: AppLocalizations.of(context)
-                    .translate("todosErrorTopMsgTxt"),
+                    .translate("todosEmptyTopMsgDefaultTxt"),
                 message: AppLocalizations.of(context)
-                    .translate("todosErrorBottomMsgTxt"),
+                    .translate("todosEmptyBottomDefaultMsgTxt"),
               );
             }
             return _buildTableCalendar();
@@ -271,7 +317,7 @@ class _CalendarViewState extends State<CalendarView>
                       left: 15.0, right: 15.0, bottom: 15.0, top: 10.0),
                   decoration: BoxDecoration(
                       color: schedule[index].date.day == _selectedDate.day
-                          ? Colors.purple
+                          ? kPrimaryColor
                           : Colors.white,
                       borderRadius: BorderRadius.circular(15.0)),
                   child: Column(
@@ -295,7 +341,7 @@ class _CalendarViewState extends State<CalendarView>
                           ),
                           Spacer(),
                           Icon(
-                            ReminderIcon.getReminderIcon(schedule[index].type),
+                            schedule[index].icon,
                             color: kGradientColorOne,
                           ),
                         ],

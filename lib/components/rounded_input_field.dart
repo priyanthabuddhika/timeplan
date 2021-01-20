@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:timeplan/components/text_field_container.dart';
 import 'package:timeplan/shared/constants.dart';
-
+// rounded input field for authentication pages
 class RoundedInputField extends StatelessWidget {
   final String hintText;
   final IconData icon;

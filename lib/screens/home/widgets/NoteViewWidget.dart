@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/note.dart';
-import 'package:timeplan/screens/home/empty_content.dart';
+import 'package:timeplan/screens/home/widgets/empty_content.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:timeplan/shared/constants.dart';
@@ -52,7 +52,7 @@ class _NoteViewWidgetState extends State<NoteViewWidget> {
               decoration:
                   BoxDecoration(shape: BoxShape.circle, color: Colors.white),
               padding: EdgeInsets.all(8),
-              child: Icon(Icons.calendar_view_day),
+              child: Icon(Icons.list),
             ),
           )
         ]),

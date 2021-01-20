@@ -3,11 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/date_model.dart';
 import 'package:timeplan/models/schedule.dart';
-import 'package:timeplan/screens/home/empty_content.dart';
+import 'package:timeplan/screens/home/widgets/empty_content.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:timeplan/shared/constants.dart';
-import 'package:timeplan/shared/typeIcon.dart';
 
 class ScheduleViewWidget extends StatefulWidget {
   const ScheduleViewWidget({
@@ -53,13 +52,6 @@ class _ScheduleViewWidgetState extends State<ScheduleViewWidget> {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
         ),
         trailing: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          Container(
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-            padding: EdgeInsets.all(8),
-            child: Icon(Icons.calendar_today),
-          ),
-          SizedBox(width: 10.0),
           InkWell(
             onTap: () {
               Navigator.of(context).pushNamed(
@@ -70,7 +62,7 @@ class _ScheduleViewWidgetState extends State<ScheduleViewWidget> {
               decoration:
                   BoxDecoration(shape: BoxShape.circle, color: Colors.white),
               padding: EdgeInsets.all(8),
-              child: Icon(Icons.calendar_view_day),
+              child: Icon(Icons.list_rounded),
             ),
           )
         ]),
@@ -129,8 +121,7 @@ class _ScheduleViewWidgetState extends State<ScheduleViewWidget> {
                               ),
                               Spacer(),
                               Icon(
-                                ReminderIcon.getReminderIcon(
-                                    schedule[index].type),
+                                schedule[index].icon,
                                 color: kGradientColorOne,
                               ),
                             ],
@@ -162,6 +153,7 @@ class _ScheduleViewWidgetState extends State<ScheduleViewWidget> {
                 itemCount: schedule.length);
           } else {
             return EmptyContentWidget(
+              assetSrc: "assets/icons/Add_files.svg",
               title: AppLocalizations.of(context)
                   .translate("todosEmptyTopMsgDefaultTxt"),
               message: AppLocalizations.of(context)
@@ -171,6 +163,7 @@ class _ScheduleViewWidgetState extends State<ScheduleViewWidget> {
         } else if (snapshot.hasError) {
           print("jjdfjf" + snapshot.error.toString());
           return EmptyContentWidget(
+            assetSrc: "assets/icons/Add_files.svg",
             title:
                 AppLocalizations.of(context).translate("todosErrorTopMsgTxt"),
             message: AppLocalizations.of(context)

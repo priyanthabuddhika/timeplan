@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
 import 'package:timeplan/models/user.dart';
@@ -8,7 +7,6 @@ import 'package:timeplan/models/user.dart';
 class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   // create user obj based on firebase user
   UserModel _userFromFirebaseUser(User user) {
@@ -18,7 +16,6 @@ class AuthService {
   // auth change user stream
   Stream<UserModel> get user {
     return _auth.authStateChanges().map(_userFromFirebaseUser);
-    
   }
 
   // Firebase user one-time fetch
@@ -38,9 +35,6 @@ class AuthService {
 
       UserCredential result = await _auth.signInWithCredential(credential);
       User user = result.user;
-
-      // Update user data
-      updateUserData(user);
 
       return user;
     } catch (error) {
@@ -67,7 +61,7 @@ class AuthService {
     UserCredential result = await _auth.signInAnonymously();
     User user = result.user;
 
-    updateUserData(user);
+    // updateUserData(user);
     return user;
   }
 
@@ -83,14 +77,6 @@ class AuthService {
       print(error.toString());
       return null;
     }
-  }
-
-  /// Updates the User's data in Firestore on each new login
-  Future<void> updateUserData(User user) {
-    DocumentReference reportRef = _db.collection('reports').doc(user.uid);
-
-    return reportRef.set({'uid': user.uid, 'lastActivity': DateTime.now()},
-        SetOptions(merge: true));
   }
 
   // Sign out

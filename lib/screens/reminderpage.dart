@@ -1,18 +1,15 @@
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
-import 'package:timeplan/main.dart';
 import 'package:timeplan/models/remider.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/services/app_localizations.dart';
-import 'package:timeplan/shared/timezone.dart';
 import 'package:timeplan/shared/typeWidget.dart';
 
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/standalone.dart' as tz;
+// import 'package:timezone/data/latest.dart' as tz;
+// import 'package:timezone/timezone.dart' as tz;
+// import 'package:timezone/standalone.dart' as tz;
 
 class ReminderPage extends StatefulWidget {
   static const String id = "reminderspage";
@@ -31,7 +28,7 @@ class _ReminderPageState extends State<ReminderPage> {
   TextEditingController _descriptionController;
 
   String _reminderType;
-
+  IconData iconData;
   FocusNode _titleFocus;
   FocusNode _descriptionFocus;
 
@@ -105,6 +102,7 @@ class _ReminderPageState extends State<ReminderPage> {
     if (_reminderModel != null) {
       _reminder = _reminderModel;
       _reminderType = _reminderModel.type;
+      iconData = _reminderModel.icon;
       selectedDate = _reminderModel.date;
     }
     if (!_initCompleted) {
@@ -132,8 +130,9 @@ class _ReminderPageState extends State<ReminderPage> {
             : "",
         type: _reminderType != "" ? _reminderType : "Other",
         date: selectedDate,
+        icon: iconData != null ? iconData : Icons.devices_other,
       ));
-      scheduleAlarm(selectedDate, _titleController.text);
+      // scheduleAlarm(selectedDate, _titleController.text);
       Navigator.of(context).pop();
     }
   }
@@ -248,6 +247,14 @@ class _ReminderPageState extends State<ReminderPage> {
                                 setState(() {
                                   print(value);
                                   _reminderType = value;
+                                });
+                              }
+                            },
+                            onIconChanged: (value) async {
+                              if (value != null) {
+                                setState(() {
+                                  print(value);
+                                  iconData = value;
                                 });
                               }
                             },
@@ -489,33 +496,35 @@ class _ReminderPageState extends State<ReminderPage> {
     );
   }
 
-  void scheduleAlarm(
-      DateTime scheduledNotificationDateTime, String reminderInfo) async {
-    final timeZone = new TimeZone();
+  // void scheduleAlarm(
+  //     DateTime scheduledNotificationDateTime, String reminderInfo) async {
+  //   final timeZone = new TimeZone();
 
-    // The device's timezone.
-    String timeZoneName = await timeZone.getTimeZoneName();
+  //   // The device's timezone.
+  //   String timeZoneName = await timeZone.getTimeZoneName();
 
-    // Find the 'current location'
-    final location = await timeZone.getLocation(timeZoneName);
+  //   // Find the 'current location'
+  //   final location = await timeZone.getLocation(timeZoneName);
 
-    final scheduledDate = tz.TZDateTime.from(selectedDate, location);
+  //   // ignore: unused_local_variable
+  //   final scheduledDate = tz.TZDateTime.from(selectedDate, location);
 
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'alarm_notif',
-      'alarm_notif',
-      'Channel for Alarm notification',
-      icon: 'ic_local_icon',
-    );
+  //   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  //     'alarm_notif',
+  //     'alarm_notif',
+  //     'Channel for Alarm notification',
+  //     icon: 'ic_local_icon',
+  //   );
 
-    var platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-    );
+  //   // ignore: unused_local_variable
+  //   var platformChannelSpecifics = NotificationDetails(
+  //     android: androidPlatformChannelSpecifics,
+  //   );
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-        0, 'Office', reminderInfo, scheduledDate, platformChannelSpecifics,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        androidAllowWhileIdle: true);
-  }
+  //   // await flutterLocalNotificationsPlugin.zonedSchedule(
+  //   //     0, 'Office', reminderInfo, scheduledDate, platformChannelSpecifics,
+  //   //     uiLocalNotificationDateInterpretation:
+  //   //         UILocalNotificationDateInterpretation.absoluteTime,
+  //   //     androidAllowWhileIdle: true);
+  // }
 }

@@ -14,6 +14,7 @@ class AppThemes {
   static const Color _lightButtonPrimaryColor = Colors.black;
   static const Color _lightAppBarColor = Colors.transparent;
   static Color _lightIconColor = Colors.black;
+  // ignore: unused_field
   static Color _lightSnackBarBackgroundErrorColor = Colors.redAccent;
   static Color _snackBarColor = kPrimaryColor;
 
@@ -56,8 +57,7 @@ class AppThemes {
       secondary: _lightSecondaryColor,
       onPrimary: _lightOnPrimaryColor,
     ),
-    snackBarTheme:
-        SnackBarThemeData(backgroundColor: _snackBarColor),
+    snackBarTheme: SnackBarThemeData(backgroundColor: _snackBarColor),
     iconTheme: IconThemeData(
       color: _lightIconColor,
     ),

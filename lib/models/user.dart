@@ -1,3 +1,5 @@
+// user class to avoid unnecessary data in firebase user
+
 class UserModel {
 
   final String uid;

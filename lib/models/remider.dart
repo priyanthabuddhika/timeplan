@@ -1,17 +1,14 @@
-
+import 'package:flutter/widgets.dart';
+// reminder class
 class Reminder {
   final String id;
   final String title;
   final String description;
   final String type;
   final DateTime date;
-  Reminder({
-    this.id,
-    this.title,
-    this.description,
-    this.type,
-    this.date,
-  });
+  final IconData icon;
+  Reminder(
+      {this.id, this.title, this.description, this.type, this.date, this.icon});
 
   Map<String, dynamic> toMap() {
     return {
@@ -20,6 +17,7 @@ class Reminder {
       'description': description,
       'type': type,
       'date': date.toString(),
+      'icon': icon.codePoint,
     };
   }
 
@@ -32,6 +30,13 @@ class Reminder {
     String description = data['description'];
     String type = data['type'];
     DateTime date = DateTime.parse(data['date']);
-    return Reminder(title: title, description: description, type: type, date: date,id: id);
+    IconData icon = IconData(data['icon'], fontFamily: 'MaterialIcons');
+    return Reminder(
+        title: title,
+        description: description,
+        type: type,
+        date: date,
+        id: id,
+        icon: icon);
   }
 }

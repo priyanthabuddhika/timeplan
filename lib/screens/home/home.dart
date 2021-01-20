@@ -1,10 +1,9 @@
 import 'dart:core';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:timeplan/models/schedule.dart';
 import 'package:timeplan/models/user.dart';
 import 'package:timeplan/providers/auth_provider.dart';
-import 'package:timeplan/screens/home/empty_content.dart';
+import 'package:timeplan/screens/home/widgets/empty_content.dart';
 import 'package:timeplan/screens/home/widgets/NoteViewWidget.dart';
 import 'package:timeplan/screens/home/widgets/RemindersViewWidget.dart';
 import 'package:timeplan/screens/home/widgets/ScheduleViewWidget.dart';
@@ -14,7 +13,6 @@ import 'package:provider/provider.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/shared/routes.dart';
-import 'package:timeplan/shared/typeIcon.dart';
 
 class Home extends StatelessWidget {
   static const String id = "home";
@@ -22,45 +20,9 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
-
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: kPrimaryBackgroundColor,
-      // appBar: AppBar(
-      //   title: StreamBuilder(
-      //       stream: authProvider.user,
-      //       builder: (context, snapshot) {
-      //         final UserModel user = snapshot.data;
-      //         return Text(user != null
-      //             ? user.email +
-      //                 " - " +
-      //                 AppLocalizations.of(context).translate("homeAppBarTitle")
-      //             : AppLocalizations.of(context).translate("homeAppBarTitle"));
-      //       }),
-      //   actions: <Widget>[
-      //     StreamBuilder(
-      //         stream: firestoreDatabase.remindersStream(),
-      //         builder: (context, snapshot) {
-      //           if (snapshot.hasData) {
-      //             List<Reminder> todos = snapshot.data;
-      //             return Visibility(
-      //                 visible: todos.isNotEmpty ? true : false,
-      //                 child: TodosExtraActions());
-      //           } else {
-      //             return Container(
-      //               width: 0,
-      //               height: 0,
-      //             );
-      //           }
-      //         }),
-      //     IconButton(
-      //         icon: Icon(Icons.settings),
-      //         onPressed: () {
-      //           Navigator.of(context).pushNamed(Routes.setting);
-      //         }),
-      //   ],
-      // ),
       floatingActionButton: SpeedDial(
         marginRight: 18,
         marginBottom: 20,
@@ -77,21 +39,30 @@ class Home extends StatelessWidget {
         shape: CircleBorder(),
         children: [
           SpeedDialChild(
-            child: Icon(Icons.alarm_add),
+            child: Icon(
+              Icons.alarm_add,
+              color: Colors.white,
+            ),
             backgroundColor: kGradientColorTwo,
             label: 'Add reminder',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () => Navigator.of(context).pushNamed(Routes.reminders_page),
           ),
           SpeedDialChild(
-            child: Icon(Icons.schedule),
+            child: Icon(
+              Icons.schedule,
+              color: Colors.white,
+            ),
             backgroundColor: kGradientColorTwo,
             label: 'Update schedule',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () => Navigator.of(context).pushNamed(Routes.schedules_page),
           ),
           SpeedDialChild(
-            child: Icon(Icons.note_add),
+            child: Icon(
+              Icons.note_add,
+              color: Colors.white,
+            ),
             backgroundColor: kGradientColorTwo,
             label: 'Add note',
             labelStyle: TextStyle(fontSize: 18.0),
@@ -134,43 +105,44 @@ class Home extends StatelessWidget {
         stream: authProvider.user,
         builder: (context, snapshot) {
           final UserModel user = snapshot.data;
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: user != null && user.photoURL != null
-                  ? NetworkImage(
-                      user.photoURL,
+          return GestureDetector(
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                '/profile',
+              );
+            },
+            child: ListTile(
+              leading: user != null && user.photoURL != null
+                  ? CircleAvatar(
+                      backgroundImage: NetworkImage(
+                        user.photoURL,
+                      ),
+                      child: Icon(Icons.person),
                     )
-                  : AssetImage('/assets/images/avatar.png'),
-              child: Icon(Icons.person),
-            ),
-            title: Text(
-              'Hello,',
-            ),
-            subtitle: user != null && user.displayName != null
-                ? Text(
-                    user.displayName,
-                    style: TextStyle(
-                        color: Colors.black, fontWeight: FontWeight.bold),
-                  )
-                : Text(
-                    "There!",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-            contentPadding: EdgeInsets.only(left: 10.0),
-            trailing: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.message),
-                color: kPrimaryColor,
-                onPressed: () {},
+                  : Icon(
+                      Icons.person,
+                      color: kGradientColorTwo,
+                    ),
+              title: Text(
+                'Hello,',
               ),
-              IconButton(
+              subtitle: user != null && user.displayName != null
+                  ? Text(
+                      user.displayName,
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold),
+                    )
+                  : Text(
+                      "There!",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+              contentPadding: EdgeInsets.only(left: 10.0),
+              trailing: IconButton(
                   icon: Icon(Icons.settings),
                   color: kPrimaryColor,
-                  onPressed: () async {
-                    await FirebaseAuth.instance.signOut();
-                  })
-            ]),
+                  onPressed: () {}),
+            ),
           );
         });
   }
@@ -179,6 +151,7 @@ class Home extends StatelessWidget {
     final _firestoreDatabase =
         Provider.of<FirestoreDatabase>(context, listen: false);
 
+    Size size = MediaQuery.of(context).size;
     DateTime date = DateTime.now();
     return StreamBuilder(
       stream: _firestoreDatabase.nextEvent(
@@ -260,8 +233,7 @@ class Home extends StatelessWidget {
                                     ),
                                   ),
                                   Icon(
-                                    ReminderIcon.getReminderIcon(
-                                        nextEvent.type),
+                                    nextEvent.icon,
                                     color: kPrimaryColor,
                                   )
                                 ]),
@@ -279,18 +251,6 @@ class Home extends StatelessWidget {
                             SizedBox(
                               height: 10.0,
                             ),
-                            Row(
-                              children: <Widget>[
-                                Icon(
-                                  Icons.zoom_in,
-                                  color: Colors.grey,
-                                ),
-                                Text(
-                                  'Zoom Linked - Meeting 663',
-                                  style: TextStyle(fontSize: 12),
-                                )
-                              ],
-                            ),
                           ],
                         ),
                       ),
@@ -301,16 +261,21 @@ class Home extends StatelessWidget {
               ),
             );
           } else {
-            return EmptyContentWidget(
-              title: AppLocalizations.of(context)
-                  .translate("todosEmptyTopMsgDefaultTxt"),
-              message: AppLocalizations.of(context)
-                  .translate("todosEmptyBottomDefaultMsgTxt"),
+            return SizedBox(
+              height: size.height * 0.25,
+              child: EmptyContentWidget(
+                assetSrc: "assets/icons/Add_files.svg",
+                title: AppLocalizations.of(context)
+                    .translate("todosEmptyTopMsgDefaultTxt"),
+                message: AppLocalizations.of(context)
+                    .translate("todosEmptyBottomDefaultMsgTxt"),
+              ),
             );
           }
         } else if (snapshot.hasError) {
           print("jjdfjf" + snapshot.error.toString());
           return EmptyContentWidget(
+            assetSrc: "assets/icons/Add_files.svg",
             title:
                 AppLocalizations.of(context).translate("todosErrorTopMsgTxt"),
             message: AppLocalizations.of(context)

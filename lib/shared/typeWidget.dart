@@ -7,9 +7,14 @@ import 'package:timeplan/shared/constants.dart';
 
 class ReminderTypeWidget extends StatefulWidget {
   final ValueChanged<String> onValueChanged;
+  final ValueChanged<IconData> onIconChanged;
   final String previousType;
   final bool isReminder;
-  ReminderTypeWidget({this.onValueChanged, this.previousType, this.isReminder});
+  ReminderTypeWidget(
+      {this.onValueChanged,
+      this.previousType,
+      this.isReminder,
+      this.onIconChanged});
 
   @override
   _ReminderTypeWidgetState createState() => _ReminderTypeWidgetState();
@@ -228,6 +233,7 @@ class _ReminderTypeWidgetState extends State<ReminderTypeWidget> {
               _selectedIndex = i;
             }
             widget.onValueChanged(_options[i].title);
+            widget.onIconChanged(_options[i].icon);
           });
         },
       );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:timeplan/shared/constants.dart';
-
+// rounded button used in authentication pages
 class RoundedButton extends StatelessWidget {
   final String text;
   final Function press;
@@ -15,7 +15,6 @@ class RoundedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(

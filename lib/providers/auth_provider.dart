@@ -10,18 +10,7 @@ enum Status {
   Unauthenticated,
   Registering
 }
-/*
-The UI will depends on the Status to decide which screen/action to be done.
 
-- Uninitialized - Checking user is logged or not, the Splash Screen will be shown
-- Authenticated - User is authenticated successfully, Home Page will be shown
-- Authenticating - Sign In button just been pressed, progress bar will be shown
-- Unauthenticated - User is not authenticated, login page will be shown
-- Registering - User just pressed registering, progress bar will be shown
-
-Take note, this is just an idea. You can remove or further add more different
-status for your UI or widgets to listen.
- */
 
 class AuthProvider extends ChangeNotifier {
   //Firebase Auth object

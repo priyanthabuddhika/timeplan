@@ -1,4 +1,4 @@
-
+// note class 
 class Note {
   final String id;
   final String title;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:timeplan/shared/constants.dart';
-
+// this widget is used to provide already have an account section in authentication pages
 class AlreadyHaveAnAccountCheck extends StatelessWidget {
   final bool login;
   final Function press;
@@ -12,7 +12,7 @@ class AlreadyHaveAnAccountCheck extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("worked");
+ 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[

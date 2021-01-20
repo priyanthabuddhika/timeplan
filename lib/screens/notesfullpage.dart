@@ -1,19 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/note.dart';
-import 'package:timeplan/screens/home/empty_content.dart';
+import 'package:timeplan/screens/home/widgets/empty_content.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:timeplan/services/firestore_database.dart';
+import 'package:timeplan/shared/constants.dart';
 
 class NotesFullPage extends StatelessWidget {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       key: _scaffoldKey,
-      body: _buildBodySection(context),
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.black, //change your color here
+        ),
+        elevation: 0.0,
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          "Your notes",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(
+            '/notespage',
+          );
+        },
+        backgroundColor: kGradientColorOne,
+        child: Icon(Icons.add, color: Colors.white),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: _buildBodySection(context),
+      ),
     );
   }
 
@@ -27,45 +52,32 @@ class NotesFullPage extends StatelessWidget {
           if (snapshot.hasData) {
             List<Note> notes = snapshot.data;
             if (notes.isNotEmpty) {
-              return ListView.separated(
+              return StaggeredGridView.countBuilder(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                primary: false,
+                crossAxisCount: 4,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
                 itemCount: notes.length,
                 itemBuilder: (context, index) {
-                  return Dismissible(
-                    background: Container(
-                      color: Colors.red,
-                      child: Center(
-                          child: Text(
-                        AppLocalizations.of(context)
-                            .translate("todosDismissibleMsgTxt"),
-                        style: TextStyle(color: Theme.of(context).canvasColor),
-                      )),
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.circular(kContainerBorderRadius),
                     ),
-                    key: Key(notes[index].id),
-                    onDismissed: (direction) {
-                      firestoreDatabase.deleteNote(notes[index]);
-
-                      _scaffoldKey.currentState.showSnackBar(SnackBar(
-                   
-                        content: Text(
-                          AppLocalizations.of(context)
-                                  .translate("todosSnackBarContent") +
-                              notes[index].title,
-                          style:
-                              TextStyle(color: Theme.of(context).canvasColor),
-                        ),
-                        duration: Duration(seconds: 3),
-                        action: SnackBarAction(
-                          label: AppLocalizations.of(context)
-                              .translate("todosSnackBarActionLbl"),
-                          textColor: Theme.of(context).canvasColor,
-                          onPressed: () {
-                            firestoreDatabase.setNote(notes[index]);
-                          },
-                        ),
-                      ));
-                    },
                     child: ListTile(
-                      title: Text(notes[index].title),
+                      contentPadding: EdgeInsets.all(15.0),
+                      title: Text(
+                        notes[index].title,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        notes[index].description,
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
                       onTap: () {
                         Navigator.of(context)
                             .pushNamed('/notespage', arguments: notes[index]);
@@ -73,9 +85,7 @@ class NotesFullPage extends StatelessWidget {
                     ),
                   );
                 },
-                separatorBuilder: (context, index) {
-                  return Divider(height: 0.5);
-                },
+                staggeredTileBuilder: (index) => new StaggeredTile.fit(2),
               );
             } else {
               return EmptyContentWidget(

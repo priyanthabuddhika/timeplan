@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+// schedule class
 class Schedule {
   final String id;
   final String title;
@@ -6,6 +8,7 @@ class Schedule {
   final String date;
   final DateTime startTime;
   final DateTime endTime;
+  final IconData icon;
   Schedule(
       {this.id,
       this.title,
@@ -13,7 +16,8 @@ class Schedule {
       this.type,
       this.date,
       this.startTime,
-      this.endTime});
+      this.endTime,
+      this.icon});
 
   Map<String, dynamic> toMap() {
     return {
@@ -24,6 +28,7 @@ class Schedule {
       'date': date,
       'startTime': startTime.toString(),
       'endTime': endTime.toString(),
+      'icon': icon.codePoint,
     };
   }
 
@@ -38,6 +43,8 @@ class Schedule {
     String date = data['date'];
     DateTime starttime = DateTime.parse(data['startTime']);
     DateTime endTime = DateTime.parse(data['endTime']);
+    IconData icon = IconData(data['icon'], fontFamily: 'MaterialIcons');
+
     return Schedule(
       title: title,
       description: description,
@@ -46,6 +53,7 @@ class Schedule {
       id: id,
       startTime: starttime,
       endTime: endTime,
+      icon: icon,
     );
   }
 }

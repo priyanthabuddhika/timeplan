@@ -10,6 +10,7 @@ import 'package:timeplan/screens/auth_widget_builder.dart';
 import 'package:timeplan/screens/authenticate/Login/login_screen.dart';
 import 'package:timeplan/screens/authenticate/Signup/signup_screen.dart';
 import 'package:timeplan/screens/authenticate/authenticate.dart';
+import 'package:timeplan/screens/authenticate/profile.dart';
 import 'package:timeplan/screens/calendarpage.dart';
 import 'package:timeplan/screens/fullscheduolepage.dart';
 import 'package:timeplan/screens/home/home.dart';
@@ -20,43 +21,6 @@ import 'package:timeplan/screens/scheduleaddpage.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/shared/app_themes.dart';
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({Key key, this.databaseBuilder}) : super(key: key);
-
-//   // Expose builders for 3rd party services at the root of the widget tree
-//   // This is useful when mocking services while testing
-//   final FirestoreDatabase Function(BuildContext context, String uid)
-//       databaseBuilder;
-
-//   // This widget is the root of your application.
-//   @override
-//   Widget build(BuildContext context) {
-//     return StreamProvider<UserModel>.value(
-//       value: AuthService().user,
-//       child: MaterialApp(
-//         // navigatorObservers: [
-//         //   FirebaseAnalyticsObserver(analytics: FirebaseAnalytics()),
-//         // ],
-//         // Firebase Analytics
-//         title: 'Timeplan',
-//         debugShowCheckedModeBanner: false,
-//         theme: ThemeData(
-//           primaryColor: kPrimaryColor,
-//           scaffoldBackgroundColor: Colors.white,
-//         ),
-//         // Named Routes
-//         // routes: {
-//         //   Home.id: (context) => Home(),
-//         //   WelcomeScreen.id: (context) => WelcomeScreen(),
-//         //   LoginScreen.id: (context) => LoginScreen(),
-//         //   SignUpScreen.id: (context) => SignUpScreen(),
-//         // },
-//         home: Wrapper(),
-//       ),
-//     );
-//   }
-// }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key key, this.databaseBuilder}) : super(key: key);
@@ -110,13 +74,7 @@ class MyApp extends StatelessWidget {
                   },
                   title: 'Timeplan',
                   theme: AppThemes.lightTheme,
-                  // theme: ThemeData(
-                  //     primaryColor: Color(0xFF7113D0),
-                  //     primaryColorLight: kPrimaryColor,
-                  //     accentColor: kPrimaryColor,
-                  //     timePickerTheme: TimePickerThemeData()),
-                  // routes: Routes.routes,
-                  onGenerateRoute: (settings) {
+               onGenerateRoute: (settings) {
                     switch (settings.name) {
                       case '/login':
                         return PageTransition(
@@ -152,8 +110,6 @@ class MyApp extends StatelessWidget {
                           child: SchedulePage(),
                           type: PageTransitionType.scale,
                           settings: settings,
-                          duration: Duration(milliseconds: 400),
-                          reverseDuration: Duration(milliseconds: 300),
                         );
                         break;
                       case '/reminderspage':
@@ -161,17 +117,13 @@ class MyApp extends StatelessWidget {
                           child: ReminderPage(),
                           type: PageTransitionType.scale,
                           settings: settings,
-                          duration: Duration(milliseconds: 400),
-                          reverseDuration: Duration(milliseconds: 300),
                         );
                         break;
                       case '/calendarpage':
                         return PageTransition(
                           child: CalendarView(),
-                          type: PageTransitionType.rightToLeft,
+                          type: PageTransitionType.scale,
                           settings: settings,
-                          duration: Duration(milliseconds: 400),
-                          reverseDuration: Duration(milliseconds: 300),
                         );
                         break;
                       case '/fullschedulepage':
@@ -179,8 +131,6 @@ class MyApp extends StatelessWidget {
                           child: FullSchedulePage(),
                           type: PageTransitionType.rightToLeft,
                           settings: settings,
-                          duration: Duration(milliseconds: 400),
-                          reverseDuration: Duration(milliseconds: 300),
                         );
                         break;
                       case '/notesfullpage':
@@ -188,8 +138,13 @@ class MyApp extends StatelessWidget {
                           child: NotesFullPage(),
                           type: PageTransitionType.rightToLeft,
                           settings: settings,
-                          duration: Duration(milliseconds: 400),
-                          reverseDuration: Duration(milliseconds: 300),
+                        );
+                        break;
+                      case '/profile':
+                        return PageTransition(
+                          child: ProfileScreen(),
+                          type: PageTransitionType.scale,
+                          settings: settings,
                         );
                         break;
                       default:

@@ -4,14 +4,7 @@ import 'package:timeplan/models/user.dart';
 import 'package:timeplan/providers/auth_provider.dart';
 import 'package:timeplan/services/firestore_database.dart';
 
-/*
-* This class is mainly to help with creating user dependent object that
-* need to be available by all downstream widgets.
-* Thus, this widget builder is a must to live above [MaterialApp].
-* As we rely on uid to decide which main screen to display (eg: Home or Sign In),
-* this class will helps to create all providers needed that depends on
-* the user logged data uid.
- */
+
 class AuthWidgetBuilder extends StatelessWidget {
   const AuthWidgetBuilder(
       {Key key, @required this.builder, @required this.databaseBuilder})

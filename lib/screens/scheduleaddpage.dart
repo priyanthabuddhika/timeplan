@@ -1,7 +1,6 @@
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:timeplan/models/remindertype.dart';
 import 'package:timeplan/models/schedule.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/shared/constants.dart';
@@ -25,6 +24,7 @@ class _SchedulePageState extends State<SchedulePage> {
   TextEditingController _descriptionController;
 
   String _scheduleType;
+  IconData icon;
   String _weekDay;
 
   FocusNode _titleFocus;
@@ -153,6 +153,7 @@ class _SchedulePageState extends State<SchedulePage> {
         date: _weekDay,
         startTime: startTime,
         endTime: endTime,
+        icon: icon != null ? icon : Icons.devices_other,
       ));
 
       Navigator.of(context).pop();
@@ -266,8 +267,14 @@ class _SchedulePageState extends State<SchedulePage> {
                               onValueChanged: (value) async {
                                 if (value != "") {
                                   setState(() {
-                                    print(value);
                                     _scheduleType = value;
+                                  });
+                                }
+                              },
+                              onIconChanged: (value) async {
+                                if (value != null) {
+                                  setState(() {
+                                    icon = value;
                                   });
                                 }
                               },

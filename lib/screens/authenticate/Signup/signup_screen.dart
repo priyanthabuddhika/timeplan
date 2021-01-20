@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:timeplan/screens/authenticate/Signup/components/body.dart';
-
+// sign up screen root widget
 class SignUpScreen extends StatelessWidget {
   final Function toggleView;
   static const String id = "signup";

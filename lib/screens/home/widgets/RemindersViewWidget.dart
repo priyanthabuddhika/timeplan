@@ -3,13 +3,12 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/date_model.dart';
 import 'package:timeplan/models/remider.dart';
-import 'package:timeplan/screens/home/empty_content.dart';
+import 'package:timeplan/screens/home/widgets/empty_content.dart';
 import 'package:timeplan/screens/home/widgets/dateTile.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/shared/routes.dart';
-import 'package:timeplan/shared/typeIcon.dart';
 
 class RemindersViewWidget extends StatefulWidget {
   const RemindersViewWidget({
@@ -53,8 +52,6 @@ class _RemindersViewWidgetState extends State<RemindersViewWidget> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    // final firestoreDatabase =
-    //     Provider.of<FirestoreDatabase>(context, listen: false);
     dates = new List<DateModel>();
     DateTime tempDate = DateTime.now();
     date = new DateTime(tempDate.year, tempDate.month, tempDate.day);
@@ -207,8 +204,8 @@ class _RemindersViewWidgetState extends State<RemindersViewWidget> {
                         trailing: Padding(
                           padding: const EdgeInsets.only(bottom: 20),
                           child: Icon(
-                            ReminderIcon.getReminderIcon(schedule[index].type),
-                            color: kGradientColorTwo,
+                           schedule[index].icon,
+                                     color: kGradientColorTwo,
                           ),
                         ),
                       ),

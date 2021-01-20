@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-
+// reminder type class
 class ReminderTypeModel {
   String title;
   IconData icon;
