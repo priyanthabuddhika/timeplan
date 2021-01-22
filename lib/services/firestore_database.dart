@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
@@ -151,31 +150,4 @@ class FirestoreDatabase {
     );
   }
 
-  //Method to mark all reminderModel to be complete
-  Future<void> setAllreminderComplete() async {
-    final batchUpdate = FirebaseFirestore.instance.batch();
-
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection(FirestorePath.reminders(uid))
-        .get();
-
-    for (DocumentSnapshot ds in querySnapshot.docs) {
-      batchUpdate.update(ds.reference, {'complete': true});
-    }
-    await batchUpdate.commit();
-  }
-
-  Future<void> deleteAllreminderWithComplete() async {
-    final batchDelete = FirebaseFirestore.instance.batch();
-
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection(FirestorePath.reminders(uid))
-        .where('complete', isEqualTo: true)
-        .get();
-
-    for (DocumentSnapshot ds in querySnapshot.docs) {
-      batchDelete.delete(ds.reference);
-    }
-    await batchDelete.commit();
-  }
 }

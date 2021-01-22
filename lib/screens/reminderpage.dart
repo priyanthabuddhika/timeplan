@@ -1,10 +1,12 @@
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/models/remider.dart';
 import 'package:timeplan/services/firestore_database.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/services/app_localizations.dart';
+import 'package:timeplan/shared/regex.dart';
 import 'package:timeplan/shared/typeWidget.dart';
 
 // import 'package:timezone/data/latest.dart' as tz;
@@ -37,6 +39,9 @@ class _ReminderPageState extends State<ReminderPage> {
 
   bool _initCompleted;
 
+  Map<String, bool> apps;
+  String extraData;
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
         context: context,
@@ -45,7 +50,7 @@ class _ReminderPageState extends State<ReminderPage> {
         lastDate: DateTime(2101));
     if (picked != null && picked != selectedDate)
       setState(() {
-        // 
+        //
         selectedDate = picked;
       });
   }
@@ -63,7 +68,6 @@ class _ReminderPageState extends State<ReminderPage> {
       setState(() {
         selectedDate = dateTimeTemp;
         selectedTime = picked;
-        
       });
     }
   }
@@ -75,11 +79,19 @@ class _ReminderPageState extends State<ReminderPage> {
     _descriptionFocus = FocusNode();
 
     selectedDate = DateTime.now();
-    
+
     selectedTime = TimeOfDay.now();
 
     _reminderType = "";
 
+    apps = {
+      'url': false,
+      'alarm': false,
+      'email': false,
+      'zoom': false,
+      'calendar': false
+    };
+    extraData = "";
     _initCompleted = false;
 
     super.initState();
@@ -104,18 +116,19 @@ class _ReminderPageState extends State<ReminderPage> {
       _reminderType = _reminderModel.type;
       iconData = _reminderModel.icon;
       selectedDate = _reminderModel.date;
+      apps = _reminderModel.apps;
     }
     if (!_initCompleted) {
       _titleController =
           TextEditingController(text: _reminder != null ? _reminder.title : "");
       _descriptionController = TextEditingController(
-          text: _reminder != null ? _reminder.description : "");
+          text:
+              _reminder != null ? _reminder.description.split("<.^.>")[0] : "");
       _initCompleted = true;
     }
   }
 
   void saveToFirestore() {
-    
     if (_formKey.currentState.validate()) {
       FocusScope.of(context).unfocus();
 
@@ -126,11 +139,12 @@ class _ReminderPageState extends State<ReminderPage> {
         id: _reminder != null ? _reminder.id : documentIdFromCurrentDate(),
         title: _titleController.text,
         description: _descriptionController.text.length > 0
-            ? _descriptionController.text
-            : "",
+            ? _descriptionController.text + extraData
+            : "" + extraData,
         type: _reminderType != "" ? _reminderType : "Other",
         date: selectedDate,
         icon: iconData != null ? iconData : Icons.devices_other,
+        apps: apps,
       ));
       // scheduleAlarm(selectedDate, _titleController.text);
       Navigator.of(context).pop();
@@ -245,7 +259,6 @@ class _ReminderPageState extends State<ReminderPage> {
                             onValueChanged: (value) async {
                               if (value != "") {
                                 setState(() {
-                                  
                                   _reminderType = value;
                                 });
                               }
@@ -253,7 +266,6 @@ class _ReminderPageState extends State<ReminderPage> {
                             onIconChanged: (value) async {
                               if (value != null) {
                                 setState(() {
-                                  
                                   iconData = value;
                                 });
                               }
@@ -434,6 +446,16 @@ class _ReminderPageState extends State<ReminderPage> {
                               style: TextStyle(fontWeight: FontWeight.bold),
                               maxLines: 15,
                               focusNode: _descriptionFocus,
+                              onChanged: (val) {
+                                final urlMatch = urlRegex.stringMatch(val);
+
+                                if (urlMatch != null) {
+                                  setState(() {
+                                    apps['url'] = true;
+                                    print("hari");
+                                  });
+                                }
+                              },
                               // onChanged: (value) async {},
                               controller: _descriptionController,
                               decoration: InputDecoration(
@@ -447,6 +469,46 @@ class _ReminderPageState extends State<ReminderPage> {
                       ),
                     ),
                   ),
+                  Container(
+                    padding: EdgeInsets.all(15.0),
+                    margin: EdgeInsets.only(
+                      bottom: 20.0,
+                      left: 20.0,
+                      right: 20.0,
+                      top: 10.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(
+                          kBoxDecorationRadius), //Color(0xFFF6F6F6),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "App intergrations",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        ButtonBar(
+                          alignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              iconSize: 40,
+                              icon: Icon(FontAwesomeIcons.globe,
+                                  color: apps['url']
+                                      ? kPrimaryColor
+                                      : Colors.grey),
+                              onPressed: () {
+                                if (!apps['url']) {
+                                  appIntergration("url");
+                                } else {}
+                              },
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -456,7 +518,7 @@ class _ReminderPageState extends State<ReminderPage> {
             onPressed: () async {
               Reminder _reminderToDelete =
                   ModalRoute.of(context).settings.arguments;
-              
+
               if (_reminderToDelete != null) {
                 final firestoreDatabase =
                     Provider.of<FirestoreDatabase>(context, listen: false);
@@ -496,6 +558,89 @@ class _ReminderPageState extends State<ReminderPage> {
     );
   }
 
+  void appIntergration(String string) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          String text = "";
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(kContainerBorderRadius),
+            ),
+            title: Text(
+              'Intergrate your apps with this reminder',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: TextField(
+                onChanged: (value) {
+                  setState(() {
+                    text = value;
+                  });
+                },
+                decoration: InputDecoration(hintText: "Enter $string"),
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(kContainerBorderRadius),
+                ),
+                textColor: Colors.red,
+                child: Text('Cancel'),
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              FlatButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(kContainerBorderRadius),
+                ),
+                color: kGradientColorOne,
+                textColor: Colors.white,
+                child: Text('Add'),
+                onPressed: () {
+                  final urlMatch = urlRegex.stringMatch(text);
+
+                  if (urlMatch != null) {
+                    setState(() {
+                      apps['url'] = true;
+                      extraData = "<.^.>$urlMatch";
+                      _scaffoldKey.currentState.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "URL saved",
+                            style:
+                                TextStyle(color: Theme.of(context).canvasColor),
+                          ),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                      Navigator.pop(context);
+                    });
+                  } else {
+                    _scaffoldKey.currentState.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "Entered text is not a valid $string",
+                          style:
+                              TextStyle(color: Theme.of(context).canvasColor),
+                        ),
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+              SizedBox(width: 10.0)
+            ],
+          );
+        });
+  }
   // void scheduleAlarm(
   //     DateTime scheduledNotificationDateTime, String reminderInfo) async {
   //   final timeZone = new TimeZone();

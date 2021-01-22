@@ -11,6 +11,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:timeplan/services/firestore_database.dart';
+import 'package:timeplan/services/intents.dart';
 import 'package:timeplan/shared/constants.dart';
 import 'package:timeplan/shared/routes.dart';
 
@@ -141,7 +142,10 @@ class Home extends StatelessWidget {
               trailing: IconButton(
                   icon: Icon(Icons.settings),
                   color: kPrimaryColor,
-                  onPressed: () {}),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) => IntentService()));
+                  }),
             ),
           );
         });
@@ -273,7 +277,6 @@ class Home extends StatelessWidget {
             );
           }
         } else if (snapshot.hasError) {
-          
           return EmptyContentWidget(
             assetSrc: "assets/icons/Add_files.svg",
             title:

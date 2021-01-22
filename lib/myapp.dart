@@ -20,6 +20,7 @@ import 'package:timeplan/screens/reminderpage.dart';
 import 'package:timeplan/screens/scheduleaddpage.dart';
 import 'package:timeplan/services/app_localizations.dart';
 import 'package:timeplan/services/firestore_database.dart';
+import 'package:timeplan/services/intents.dart';
 import 'package:timeplan/shared/app_themes.dart';
 
 class MyApp extends StatelessWidget {
@@ -74,7 +75,7 @@ class MyApp extends StatelessWidget {
                   },
                   title: 'Timeplan',
                   theme: AppThemes.lightTheme,
-               onGenerateRoute: (settings) {
+                  onGenerateRoute: (settings) {
                     switch (settings.name) {
                       case '/login':
                         return PageTransition(
@@ -143,6 +144,13 @@ class MyApp extends StatelessWidget {
                       case '/profile':
                         return PageTransition(
                           child: ProfileScreen(),
+                          type: PageTransitionType.scale,
+                          settings: settings,
+                        );
+                        break;
+                      case ExplicitIntentsWidget.routeName:
+                        return PageTransition(
+                          child: ExplicitIntentsWidget(),
                           type: PageTransitionType.scale,
                           settings: settings,
                         );

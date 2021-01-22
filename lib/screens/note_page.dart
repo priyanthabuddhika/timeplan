@@ -264,7 +264,6 @@ class _NotePageState extends State<NotePage> {
 
                   _scaffoldKey.currentState.showSnackBar(
                     SnackBar(
-                      backgroundColor: Theme.of(context).appBarTheme.color,
                       content: Text(
                         AppLocalizations.of(context)
                                 .translate("todosSnackBarContent") +

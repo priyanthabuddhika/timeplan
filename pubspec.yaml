@@ -45,14 +45,21 @@ dependencies:
   shared_preferences: ^0.5.12+4
   intl: ^0.16.1
 
+  share: ^0.6.5+4
+  android_intent: ^0.3.7+7
+
   table_calendar: ^2.3.2
   timeline_tile: ^1.0.0
   flutter_speed_dial: ^1.2.5
   page_transition: ^1.1.7+6
   cool_alert: ^1.0.3
+  font_awesome_flutter: ^8.11.0
+  
   flutter_native_timezone: ^1.0.4
   flutter_iconpicker: ^2.2.2
   flutter_staggered_grid_view: ^0.3.3
+
+
 
 dev_dependencies:
   flutter_test:
